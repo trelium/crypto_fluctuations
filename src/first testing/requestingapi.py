@@ -7,4 +7,7 @@ response=response.json()
 print(response)
 
 print('ho modificato il file dalla macchina virtuale')
+print('test')
 print(len(response))
+
+print('test222')
