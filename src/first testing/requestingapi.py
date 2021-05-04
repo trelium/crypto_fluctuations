@@ -6,4 +6,5 @@ response = requests.get("https://api.coingecko.com/api/v3/coins/bitcoin/history?
 response=response.json()
 print(response)
 
+print('test')
 print(len(response))
