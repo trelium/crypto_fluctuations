@@ -16,12 +16,12 @@ def sample_responses(input_text):
     
     def extract_coinpct (inputpreference, user_dict):
         substr = inputpreference.split('@')
-        if re.match('-{0,1}[0-9]+\.{0,1}[0-9]*%{0,1}', substr[2]):
-            foundpct = float(re.findall('-{0,1}[0-9]+\.{0,1}[0-9]*%{0,1}', substr).pop().rstrip('%'))
-            user_dict[substr[0]] = foundpct
-        elif re.match('-{0,1}[0-9]+,{0,1}[0-9]*%{0,1}', substr[2]): #changes only a comma from previous 
-            foundpct = float(re.findall('-{0,1}[0-9]+,{0,1}[0-9]*%{0,1}', substr).pop().rstrip('%'))
-            user_dict[substr[0]] = foundpct
+        if re.match('-{0,1}[0-9]+\.{0,1}[0-9]*%{0,1}', substr[1].replace(' ','')):
+            foundpct = float(re.findall('-{0,1}[0-9]+\.{0,1}[0-9]*%{0,1}', substr[1]).pop().rstrip('%'))
+            user_dict[substr[0].replace(' ','')] = foundpct
+        elif re.match('-{0,1}[0-9]+,{0,1}[0-9]*%{0,1}', substr[1].replace(' ','')): #changes only a comma from previous 
+            foundpct = float(re.findall('-{0,1}[0-9]+,{0,1}[0-9]*%{0,1}', substr[1]).pop().rstrip('%'))
+            user_dict[substr[0].replace(' ','')] = foundpct
         else:
             return ValueError 
         return user_dict
