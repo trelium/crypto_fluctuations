@@ -1,0 +1,12 @@
+sub:
+mosquitto_sub -t "test"
+mosquitto_sub -h localhost -t /home/sensors/temp/# 
+
+pub: 
+mosquitto_pub -m "message from mosquitto_pub client" -t "test"
+mosquitto_pub -h address -t topic -m “message”
+
+stop: sudo service mosquitto stop
+se non funziona: " killall mosquitto " e poi " sudo service mosquitto stop "
+
+start: mosquitto -v
