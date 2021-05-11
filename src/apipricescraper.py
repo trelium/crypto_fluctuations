@@ -57,4 +57,13 @@ class pricescraper:
 
 
 mainscraper=pricescraper(['bitcoin'])
+
+# the mqtt topic where things are being published is scraper/nomecrypto.
+# nel caso del bitcoin: scraper/bitcoin
 mainscraper.scrapepricedata()
+
+# Per impostare il crontab che runna a mezzanotte di questo programma:
+# 0 0 * * * python /home/bdtstudent/MainProject/crypto_fluctuations/src/apipricescraper.py >/dev/null 2>&1
+
+# Per cancellare tutti i crontab:
+# crontab -r
