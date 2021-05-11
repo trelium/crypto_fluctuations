@@ -3,33 +3,58 @@ import json
 import paho.mqtt.client as mqtt
 
 
-# list of all cryptos that we are interested in. 
-# the list must contain the correct coin id to work
-# To get a list of all coin IDs, the request url is "https://api.coingecko.com/api/v3/coins/list"
+
 analyzedcryptos=['bitcoin']
 
 
-def scrapepricedata(analyzedcryptos):
-    for crypto in analyzedcryptos:
+
+class pricescraper:
+
+    def __init__(self,analyzedcryptos,analyzeddays=90,projectbroker='51.144.5.107'):
+
+        # list of all cryptos that we are interested in. 
+        # the list must contain the correct coin id to work
+        # To get a list of all coin IDs, the request url is "https://api.coingecko.com/api/v3/coins/list"
+        if type(analyzedcryptos)!=list:
+            self.cryptos=[analyzedcryptos]
+        else:
+            self.cryptos=analyzedcryptos
+
+        # Warning: due to the automatic granularity of the API, daily data will be used for duration above 90 days.
+        # Hourly data will be used for duration between 1 day and 90 days.
+        if type(analyzeddays)==int or type(analyzeddays)==float:
+            self.days=int(analyzeddays)
+        else:
+            raise ValueError('Input days should be numeric.')
+
+        #setup ip address for mqtt
+        self.broker=projectbroker
+
+    def scrapepricedata(self):
+        for crypto in self.cryptos:
+            response= requests.get("https://api.coingecko.com/api/v3/coins/"+crypto+"/market_chart?vs_currency=usd&days="+str(self.days))
+            response=response.json()
+            
+            for pricedatapoint in response['prices']:
+                self.mqttpublisher(crypto,pricedatapoint)
+
+    
+    def mqttpublisher(self,crypto,pricedatapoint):
         
-        #richiedo i dati
-        response= requests.get("https://api.coingecko.com/api/v3/coins/"+crypto+"/market_chart?vs_currency=usd&days=90")
-        response=response.json()
-        
-        for i in response['prices']:
-            print(i)
+        #mqtt connecter
+        client = mqtt.Client('scraperclient')
+        def on_connect(client, userdata, flags, rc):
+            if rc==0:
+                print("connected OK Returned code=",rc)
+            else:
+                print("Bad connection Returned code=",rc)
+        client.on_connect = on_connect
+        client.connect(self.broker, 1883, 60)
+
+        #mqttpublisher
+        path='scraper/'+crypto
+        client.publish(path,str(pricedatapoint), qos=0)
 
 
-#scrapepricedata(analyzedcryptos)
-
-def on_connect(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
-
-    # Subscribing in on_connect() means that if we lose the connection and
-    # reconnect then subscriptions will be renewed.
-    client.subscribe("$SYS/#")
-
-client = mqtt.Client()
-client.on_connect = on_connect
-client.connect('51.144.5.107', 1883, 60)
-client.publish('test', 'message', qos=0)
+mainscraper=pricescraper(['bitcoin'])
+mainscraper.scrapepricedata()
