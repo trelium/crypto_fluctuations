@@ -63,7 +63,12 @@ mainscraper=pricescraper(['bitcoin'])
 mainscraper.scrapepricedata()
 
 # Per impostare il crontab che runna a mezzanotte di questo programma:
-# 0 0 * * * python /home/bdtstudent/MainProject/crypto_fluctuations/src/apipricescraper.py >/dev/null 2>&1
+# 0 22 * * * python /home/bdtstudent/MainProject/crypto_fluctuations/src/apipricescraper.py >/dev/null 2>&1
+# 22^ perché di default crontab usa l'utc
+
+# se non sai usare crontab: premi crontab -e per vedere tutti i vari programmi
+# ed i loro orari.
+
 
 # Per cancellare tutti i crontab:
 # crontab -r
