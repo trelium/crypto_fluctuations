@@ -1,5 +1,6 @@
 import pyodbc
 import paho.mqtt.client as mqtt
+import time
 
 class mqtttosql:
 
@@ -35,7 +36,15 @@ class mqtttosql:
         def on_message(client, userdata, msg):
             print(msg.topic+" "+str(msg.payload))
 
+            # qui è tutto un to be continued
+            # if len(self.cursor.execute('SELECT * FROM dbo.pricedata').fetchall())<=200:
+            #     pass
 
+
+            coin=msg.topic[str(msg.topic).rfind('/')+1:]
+            
+            deleted=0
+            print(coin)
 
         client = mqtt.Client()
         client.connect(self.broker, 1883, 60)
@@ -43,17 +52,19 @@ class mqtttosql:
         client.on_connect = on_connect
 
         client.loop_start()
-        client.loop_forever()
+        time.sleep(600)
+        #client.loop_forever()
 
-    def sqlexecute(self,query):
+    def sqlexecute(self,query,commit=False):
         self.cursor.execute(query)
-        self.cursor.commit()
+
+        if commit:
+            self.cursor.commit()
 
         return self.cursor
 
 
 test=mqtttosql()
 test.listenscrapers()
-#test.sqlexecute()
 
 #print(test.cursor)
