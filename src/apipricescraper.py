@@ -3,11 +3,6 @@ import json
 import paho.mqtt.client as mqtt
 
 
-
-analyzedcryptos=['bitcoin']
-
-
-
 class pricescraper:
 
     def __init__(self,analyzedcryptos,analyzeddays=90,projectbroker='51.144.5.107'):
