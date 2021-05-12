@@ -22,33 +22,43 @@ class mqtttosql:
     def listenscrapers(self):
 
         #mqtt connecter
-        client = mqtt.Client('scraperclient')
+
         def on_connect(client, userdata, flags, rc):
             if rc==0:
                 print("connected OK Returned code=",rc)
                 client.subscribe("#")
             else:
                 print("Bad connection Returned code=",rc)
+
+        def on_message(client, userdata, msg):
+            #print(msg.topic+" "+str(msg.payload))
+
+            print(msg.payload)
+            print(msg.state)
+            print(msg.dup)
+            print(msg.info)
+
+
+
+        client = mqtt.Client()
+        client.connect(self.broker, 1883, 60)
+        client.on_message = on_message
         client.on_connect = on_connect
 
 
 
-        def on_message(client, userdata, msg):
-            print('barbapapà')
-            print(msg.topic+" "+str(msg.payload))
-            print(msg)
-
-        client.on_message = on_message
-
-
-        client.connect(self.broker, 1883, 60)
-
         client.loop_start()
         client.loop_forever()
-        time.sleep(100)
 
+    def sqlexecute(self,query):
+        self.cursor.execute(query)
+        self.cursor.commit()
 
+        return self.cursor
 
 
 test=mqtttosql()
-test.listenscrapers()
+#test.listenscrapers()
+test.sqlexecute()
+
+#print(test.cursor)
