@@ -52,7 +52,7 @@ class pricescraper:
         client.publish(path,str(pricedatapoint), qos=0)
 
 
-mainscraper=pricescraper(['bitcoin'],analyzeddays=200)
+mainscraper=pricescraper(['ethereum','bitcoin'],analyzeddays=200)
 
 # the mqtt topic where things are being published is scraper/nomecrypto.
 # nel caso del bitcoin: scraper/bitcoin

@@ -26,17 +26,14 @@ class mqtttosql:
         def on_connect(client, userdata, flags, rc):
             if rc==0:
                 print("connected OK Returned code=",rc)
-                client.subscribe("#")
+                client.subscribe("scraper/#")
             else:
                 print("Bad connection Returned code=",rc)
 
-        def on_message(client, userdata, msg):
-            #print(msg.topic+" "+str(msg.payload))
 
-            print(msg.payload)
-            print(msg.state)
-            print(msg.dup)
-            print(msg.info)
+        #QUI c'è quello che succede ogniqualvolta arriva un nuovo messaggio al topic a cui hai fatto subscribe.
+        def on_message(client, userdata, msg):
+            print(msg.topic+" "+str(msg.payload))
 
 
 
@@ -44,8 +41,6 @@ class mqtttosql:
         client.connect(self.broker, 1883, 60)
         client.on_message = on_message
         client.on_connect = on_connect
-
-
 
         client.loop_start()
         client.loop_forever()
@@ -58,7 +53,7 @@ class mqtttosql:
 
 
 test=mqtttosql()
-#test.listenscrapers()
-test.sqlexecute()
+test.listenscrapers()
+#test.sqlexecute()
 
 #print(test.cursor)
