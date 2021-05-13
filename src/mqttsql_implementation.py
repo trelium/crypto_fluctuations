@@ -89,4 +89,3 @@ class mqtttosql:
 test=mqtttosql()
 test.listenscrapers()
 
-#print(test.cursor)
