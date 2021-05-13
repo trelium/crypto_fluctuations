@@ -1,5 +1,4 @@
 import requests
-import json
 import paho.mqtt.client as mqtt
 
 
@@ -24,39 +23,53 @@ class pricescraper:
             raise ValueError('Input days should be numeric.')
 
         #setup ip address for mqtt
+        #self.broker=projectbroker
+
+        #mqtt connecter
         self.broker=projectbroker
+        self.client=None
+        self.connected=False
+
+    def objconnect(self):
+        #connects the object to a mqtt broker
+        def on_connect(client, userdata, flags, rc):
+            if rc==0:
+                print("connected OK Returned code=",rc)
+            else:
+                print("Bad connection Returned code=",rc)
+
+        self.client = mqtt.Client('scraperclient')
+        self.client.on_connect = on_connect
+        self.client.connect(self.broker, 1883, 60)
+        self.connected=True
+
 
     def scrapepricedata(self):
         for crypto in self.cryptos:
             response= requests.get("https://api.coingecko.com/api/v3/coins/"+crypto+"/market_chart?vs_currency=usd&days="+str(self.days))
             response=response.json()
             
+            self.objconnect()
+
             for pricedatapoint in response['prices']:
                 self.mqttpublisher(crypto,pricedatapoint)
 
     
     def mqttpublisher(self,crypto,pricedatapoint):
-        
-        #mqtt connecter
-        client = mqtt.Client('scraperclient')
-        def on_connect(client, userdata, flags, rc):
-            if rc==0:
-                print("connected OK Returned code=",rc)
-            else:
-                print("Bad connection Returned code=",rc)
-        client.on_connect = on_connect
-        client.connect(self.broker, 1883, 60)
-
         #mqttpublisher
+        if self.connected==False:
+            raise Exception('The object is not connected to a mqtt broker.')
+
         path='scraper/'+crypto
-        client.publish(path,str(pricedatapoint), qos=0)
+        self.client.publish(path,str(pricedatapoint), qos=0)
 
 
 mainscraper=pricescraper(['ethereum','bitcoin'],analyzeddays=200)
+mainscraper.scrapepricedata()
 
 # the mqtt topic where things are being published is scraper/nomecrypto.
 # nel caso del bitcoin: scraper/bitcoin
-mainscraper.scrapepricedata()
+#mainscraper.scrapepricedata()
 
 
 # Per impostare il crontab che runna a mezzanotte di questo programma:

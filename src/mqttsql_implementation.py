@@ -35,13 +35,13 @@ class mqtttosql:
         #QUI c'è quello che succede ogniqualvolta arriva un nuovo messaggio al topic a cui hai fatto subscribe.
         def on_message(client, userdata, msg):
             
+            # Se non si vuole salvare i dati dell'mqtt, basta specificarlo quando si chiama
+            # "listenscrapers" mettendo l'argomento "save" come falso.
             if not save:
                 print(msg.topic+" "+str(msg.payload))
                 return None
 
-            # qui è tutto un to be continued
-            # if len(self.cursor.execute('SELECT * FROM dbo.pricedata').fetchall())<=200:
-            #     pass
+            # Formatto il messaggio in arrivo per essere inserito dentro l'SQL
             try:
                 templist=str(msg.payload)[3:-2].split(', ')
                 temptime=int(templist[0])
@@ -51,8 +51,13 @@ class mqtttosql:
             except:
                 raise ValueError('There is a problem with the values')
 
-            self.sqlexecute("""INSERT INTO dbo.pricedata VALUES('{}',{},{},{});""".format(coin,temptime,tempprice,deleted),
-            commit=True)
+
+            #IF the value is already inserted in the SQL, don't add it again, otherwise, add it.
+            if len(self.sqlexecute("SELECT * FROM dbo.pricedata WHERE timevalue={} AND coin LIKE '{}';".format(temptime,coin)).fetchall())!=0:
+                return None
+            else:
+                self.sqlexecute("""INSERT INTO dbo.pricedata VALUES('{}',{},{},{});""".format(coin,temptime,tempprice,deleted),
+                commit=True)
 
 
 
@@ -75,6 +80,6 @@ class mqtttosql:
 
 
 test=mqtttosql()
-test.listenscrapers()
+test.listenscrapers(False)
 
 #print(test.cursor)
