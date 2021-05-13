@@ -1,7 +1,6 @@
 import pyodbc
 import paho.mqtt.client as mqtt
 import time
-import datetime
 
 class mqtttosql:
 
@@ -52,12 +51,12 @@ class mqtttosql:
             except:
                 raise ValueError('There is a problem with the values')
 
-
             # aggiungere un if che toglie la data della giornata.
-            # Questo perché la nostra API di default considera anche il valore di oggi, che invece non vogliamo considerare.
-            if datetime.date.fromtimestamp(temptime/1000)==datetime.date.today():
+            # Questo perché la nostra API di default considera anche il valore 
+            # più recente di oggi, che invece non vogliamo considerare.
+            if str(temptime)[-5:]!='00000':
                 return None
-            # NON STA FUNZIONANDO. STA CANCELLANDO ANCHE LA DATA DI IERI.
+
             
 
             #IF the value is already inserted in the SQL, don't add it again, otherwise, add it.
