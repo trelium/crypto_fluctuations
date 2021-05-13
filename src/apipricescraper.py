@@ -78,7 +78,7 @@ work with daily data and as such there might be errors. Are you sure you want to
 
 
 
-mainscraper=pricescraper(['ethereum','bitcoin'],analyzeddays=201)
+mainscraper=pricescraper(['ethereum','bitcoin'],analyzeddays=200)
 mainscraper.scrapepricedata()
 
 # the mqtt topic where things are being published is scraper/nomecrypto.
