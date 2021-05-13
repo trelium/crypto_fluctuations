@@ -20,7 +20,7 @@ class mqtttosql:
         self.broker='51.144.5.107'
 
 
-    def listenscrapers(self):
+    def listenscrapers(self,save=True):
 
         #mqtt connecter
 
@@ -34,17 +34,27 @@ class mqtttosql:
 
         #QUI c'è quello che succede ogniqualvolta arriva un nuovo messaggio al topic a cui hai fatto subscribe.
         def on_message(client, userdata, msg):
-            print(msg.topic+" "+str(msg.payload))
+            
+            if not save:
+                print(msg.topic+" "+str(msg.payload))
+                return None
 
             # qui è tutto un to be continued
             # if len(self.cursor.execute('SELECT * FROM dbo.pricedata').fetchall())<=200:
             #     pass
+            try:
+                templist=str(msg.payload)[3:-2].split(', ')
+                temptime=int(templist[0])
+                tempprice=float(templist[1])
+                coin=msg.topic[msg.topic.rfind('/')+1:]
+                deleted=0
+            except:
+                raise ValueError('There is a problem with the values')
+
+            self.sqlexecute("""INSERT INTO dbo.pricedata VALUES('{}',{},{},{});""".format(coin,temptime,tempprice,deleted),
+            commit=True)
 
 
-            coin=msg.topic[str(msg.topic).rfind('/')+1:]
-            
-            deleted=0
-            print(coin)
 
         client = mqtt.Client()
         client.connect(self.broker, 1883, 60)
