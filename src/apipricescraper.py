@@ -18,7 +18,20 @@ class pricescraper:
         # Warning: due to the automatic granularity of the API, daily data will be used for duration above 90 days.
         # Hourly data will be used for duration between 1 day and 90 days.
         if type(analyzeddays)==int or type(analyzeddays)==float:
-            self.days=int(analyzeddays)
+            if int(analyzeddays)<200:
+                confirmdays=input(
+
+"""Are you sure you want to scrape less than 200 days?
+Please consider that, while the scraping will work just fine, the SQL has been designed to
+work with daily data and as such there might be errors. Are you sure you want to proceed? (Y/N)  """)
+                confirmdays=confirmdays.lower()
+                if 'y' in confirmdays:
+                    print('yes!')
+                    self.days=int(analyzeddays)
+                else:
+                    self.days=200
+            else:    
+                self.days=int(analyzeddays)
         else:
             raise ValueError('Input days should be numeric.')
 
@@ -64,7 +77,8 @@ class pricescraper:
         self.client.publish(path,str(pricedatapoint), qos=0)
 
 
-mainscraper=pricescraper(['ethereum','bitcoin'],analyzeddays=200)
+
+mainscraper=pricescraper(['ethereum','bitcoin'],analyzeddays=201)
 mainscraper.scrapepricedata()
 
 # the mqtt topic where things are being published is scraper/nomecrypto.

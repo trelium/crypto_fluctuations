@@ -57,15 +57,29 @@ class mqtttosql:
             if str(temptime)[-5:]!='00000':
                 return None
 
-            
 
             #IF the value is already inserted in the SQL, don't add it again, otherwise, add it.
             if len(self.sqlexecute("SELECT * FROM dbo.pricedata WHERE timevalue={} AND coin LIKE '{}';".format(temptime,coin)).fetchall())!=0:
-                return None
+                #return None
+                pass            
             else:
                 self.sqlexecute("""INSERT INTO dbo.pricedata VALUES('{}',{},{},{});""".format(coin,temptime,tempprice,deleted),
                 commit=True)
 
+
+            #Basically: if the database has more than 200 non-deleted
+            #rows for each given coin, delete the oldest record.
+            updated=False
+            while not updated:
+                if len(self.sqlexecute("SELECT * FROM dbo.pricedata WHERE coin LIKE '{}' AND deleted=0;".format(coin)).fetchall())>200:
+                    self.sqlexecute("""
+                    UPDATE dbo.pricedata SET deleted=1 WHERE id=(
+                    SELECT id FROM dbo.pricedata WHERE 
+                    timevalue=(SELECT MIN(timevalue) FROM dbo.pricedata WHERE coin LIKE '{}' AND deleted=0)
+                    AND coin LIKE '{}'
+                    );""".format(coin,coin),True)
+                else:
+                    updated=True
 
 
         client = mqtt.Client()
@@ -76,6 +90,7 @@ class mqtttosql:
         client.loop_start()
         time.sleep(600)
         #client.loop_forever()
+
 
     def sqlexecute(self,query,commit=False):
         self.cursor.execute(query)
