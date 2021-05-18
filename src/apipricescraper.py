@@ -1,21 +1,22 @@
 import requests
 import paho.mqtt.client as mqtt
 import time
+from projecttoolbox import *
+
+
 
 class pricescraper:
     """ Scrapes the price from the CoinGecko API and sends them to the scraper/"Name of the coin" topic in our 
     MQTT server.
     """
 
-    def __init__(self,analyzedcryptos,analyzeddays=90,projectbroker='51.144.5.107'):
+    def __init__(self,analyzedcryptos,analyzeddays=90,projectbroker='13.73.184.147'):
 
         # list of all cryptos that we are interested in. 
         # the list must contain the correct coin id to work
         # To get a list of all coin IDs, the request url is "https://api.coingecko.com/api/v3/coins/list"
-        if type(analyzedcryptos)!=list:
-            self.cryptos=[analyzedcryptos]
-        else:
-            self.cryptos=analyzedcryptos
+        
+        self.cryptos=sanitizecoininput(analyzedcryptos)
 
         # Warning: due to the automatic granularity of the API, daily data will be used for duration above 90 days.
         # Hourly data will be used for duration between 1 day and 90 days.
@@ -38,10 +39,11 @@ class pricescraper:
             else:    
                 self.days=int(analyzeddays)
         else:
-            raise ValueError('Input days should be numeric.')
+            raise ValueError('Input days should be numeric. "max" is currently not supported.')
 
 
         #mqtt connecter
+        #oldip:13.73.184.147
         self.broker=projectbroker
         self.client=None
         self.connected=False
@@ -73,11 +75,11 @@ class pricescraper:
                 self.mqttpublisher(crypto,pricedatapoint)
                 #This time.sleep might be the biggest limit to the scalability of the code.
                 #I noticed that if we send a lot of messages at the same, the "sub" part of the code
-                #might lose some data points (about 0.8%) of the data while it writes on the SQL. 
+                #Will lose some of the data while it writes on the SQL. 
+                #This is because the SQL server that we are using is quite slow and the MQTT is not retaining the messages.
                 #This gives more time to the sub code to actually work out everything.
                 #I will try to make the sub code more efficient.
-                time.sleep(0.01)
-
+                time.sleep(0.25)
     
     def mqttpublisher(self,crypto,pricedatapoint):
         #quite simple: the mqtt publisher
@@ -89,7 +91,7 @@ class pricescraper:
 
 
 
-mainscraper=pricescraper(['bitcoin', 'ripple', 'ethereum','binancecoin','dogecoin'],analyzeddays=200)
+mainscraper=pricescraper(['bitcoin', 'ripple', 'ethereum','binancecoin','dogecoin'],analyzeddays=300)
 mainscraper.scrapepricedata()
 
 # the mqtt topic where things are being published is scraper/nomecrypto.

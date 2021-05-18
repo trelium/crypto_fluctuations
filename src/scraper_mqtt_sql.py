@@ -1,6 +1,7 @@
 import pyodbc
 import paho.mqtt.client as mqtt
 import time
+import datetime
 
 class mqtttosql:
     """
@@ -12,8 +13,8 @@ class mqtttosql:
     def __init__(self):
 
         #Our Server information
-        self.server = 'bdtproject-sqlserver.database.windows.net'
-        self.database = 'BDT-SQL1'
+        self.server = 'bdtproject.database.windows.net'
+        self.database = 'BDT-sql2'
         self.username = 'jacoccardo'
         self.password = 'Riccarcopo1'
         self.driver= '{ODBC Driver 17 for SQL Server}'
@@ -24,7 +25,9 @@ class mqtttosql:
         self.cursor=self.cnxn.cursor()
 
         #MQTT address
-        self.broker='51.144.5.107'
+        self.broker='13.73.184.147'
+
+        self.i=0
 
 
     def listenscrapers(self,save=True,forever=True):
@@ -46,6 +49,7 @@ class mqtttosql:
 
         #This function specifies what happens every time we receive a message on the mqtt topic scraper/"name of the crypto"
         def on_message(client, userdata, msg):
+
             
             #if save is set to "False", this code will print the message and stop the function.
             if not save:
@@ -63,6 +67,9 @@ class mqtttosql:
                 print('There is a problem with the formatting of the values of this message')
                 return None
 
+            print(self.i,coin, datetime.datetime.now())
+            self.i+=1
+
             # Our API, by default, sends us their most recent price data.
             # This checks that our data actually comes from midnight.
             if str(temptime)[-5:]!='00000':
@@ -73,23 +80,13 @@ class mqtttosql:
             if len(self.sqlexecute("SELECT * FROM dbo.pricedata WHERE timevalue={} AND coin LIKE '{}';".format(temptime,coin)).fetchall())!=0:
                 return None        
             else:
+                #print(coin,temptime,tempprice,deleted)
+                #print("'{}',{},{},{}".format(coin,temptime,tempprice,deleted))
                 self.sqlexecute("""INSERT INTO dbo.pricedata VALUES('{}',{},{},{});""".format(coin,temptime,tempprice,deleted),
                 commit=True)
 
 
-            #Basically: if the database has more than 200 non-deleted
-            #rows for this given coin, delete the oldest record by marking its deleted column.
-            updated=False
-            while not updated:
-                if len(self.sqlexecute("SELECT * FROM dbo.pricedata WHERE coin LIKE '{}' AND deleted=0;".format(coin)).fetchall())>200:
-                    self.sqlexecute("""
-                    UPDATE dbo.pricedata SET deleted=1 WHERE id=(
-                    SELECT id FROM dbo.pricedata WHERE 
-                    timevalue=(SELECT MIN(timevalue) FROM dbo.pricedata WHERE coin LIKE '{}' AND deleted=0)
-                    AND coin LIKE '{}'
-                    );""".format(coin,coin),True)
-                else:
-                    updated=True
+
 
         #MQTT connector
         client = mqtt.Client()
@@ -120,7 +117,32 @@ class mqtttosql:
 
         return self.cursor
 
+    def sqlupdater(self):
+        """
+        Basically: if the database has more than 200 non-deleted
+        rows for each given coin, delete the oldest record by marking its deleted column as deleted.
+        """  
+
+        cryptosquery=self.sqlexecute("SELECT DISTINCT coin FROM dbo.pricedata")
+        cryptos=[i[0] for i in cryptosquery.fetchall()]
+        for coin in cryptos:
+            updated=False
+            while not updated:
+                if len(self.sqlexecute("SELECT * FROM dbo.pricedata WHERE coin LIKE '{}' AND deleted=0;".format(coin)).fetchall())>200:
+                    self.sqlexecute("""
+                    UPDATE dbo.pricedata SET deleted=1 WHERE id=(
+                    SELECT id FROM dbo.pricedata WHERE 
+                    timevalue=(SELECT MIN(timevalue) FROM dbo.pricedata WHERE coin LIKE '{}' AND deleted=0)
+                    AND coin LIKE '{}'
+                    );""".format(coin,coin),True)
+                else:
+                    updated=True
+
+    
+
 
 mqttsubber=mqtttosql()
 mqttsubber.listenscrapers(forever=False)
+mqttsubber.sqlupdater()
+
 

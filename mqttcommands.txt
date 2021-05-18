@@ -13,3 +13,20 @@ stop: sudo service mosquitto stop
 se non funziona: " killall mosquitto " e poi " sudo service mosquitto stop "
 
 start: mosquitto -v
+
+
+CREATE TABLE pricedata(
+id int IDENTITY(1,1) PRIMARY KEY,
+coin VARCHAR(MAX) NOT NULL,
+timevalue BIGINT NOT NULL,   
+price FLOAT NOT NULL,
+deleted BIT NOT NULL
+);
+
+
+
+#ubuntu wsl:
+
+restart:
+net stop LxssManager
+net start LxssManager
