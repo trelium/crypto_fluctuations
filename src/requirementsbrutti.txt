@@ -3,3 +3,7 @@ Ci metto solo quelli che non sono sul tuo file
 
 sudo apt-get install python-pip
 pip install pyodbc
+time
+datetime
+
+paho-mqtt==1.5.1
