@@ -9,7 +9,7 @@ class UtentiSQL():
     by the users via the Telegram interface. 
     """
     def __init__(self):
-        self.server = 'bdtproject-sqlserver.database.windows.net'
+        self.server = 'bdtproject-sqlserver.database.windows.net' #collation: SQL_Latin1_General_CP1_CI_AS
         self.database = 'bdt-SQL1'
         self.username = 'jacoccardo'
         self.password = 'Riccarcopo1'   
