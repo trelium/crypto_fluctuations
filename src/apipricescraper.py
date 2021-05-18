@@ -10,7 +10,7 @@ class pricescraper:
     MQTT server.
     """
 
-    def __init__(self,analyzedcryptos,analyzeddays=90,projectbroker='13.73.184.147'):
+    def __init__(self,analyzedcryptos,analyzeddays=200,projectbroker='13.73.184.147'):
 
         # list of all cryptos that we are interested in. 
         # the list must contain the correct coin id to work
@@ -64,12 +64,12 @@ class pricescraper:
 
     def scrapepricedata(self):
         #This here is pretty simple: it requests the data to the API and sends them to the MQTT
+        
+        self.objconnect()
 
         for crypto in self.cryptos:
             response= requests.get("https://api.coingecko.com/api/v3/coins/"+crypto+"/market_chart?vs_currency=usd&days="+str(self.days))
             response=response.json()
-            
-            self.objconnect()
 
             for pricedatapoint in response['prices']:
                 self.mqttpublisher(crypto,pricedatapoint)
@@ -90,9 +90,9 @@ class pricescraper:
         self.client.publish(path,str(pricedatapoint), qos=0)
 
 
-
-mainscraper=pricescraper(['bitcoin', 'ripple', 'ethereum','binancecoin','dogecoin'],analyzeddays=300)
-mainscraper.scrapepricedata()
+if __name__ == "__main__":
+    mainscraper=pricescraper(['bitcoin', 'ripple', 'ethereum','binancecoin','dogecoin'])
+    mainscraper.scrapepricedata()
 
 # the mqtt topic where things are being published is scraper/nomecrypto.
 # nel caso del bitcoin: scraper/bitcoin

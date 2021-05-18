@@ -3,6 +3,7 @@ import requests
 def sanitizecoininput(analyzedcryptos):
     """
     Checks if the input list contains only coins that are listed in the CoinGecko API.
+    If a symbol (es: btc) is used, this function converts the list to the actual id.
     """
 
     if type(analyzedcryptos)!=list:

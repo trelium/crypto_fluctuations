@@ -26,17 +26,21 @@ class mqtttosql:
 
         #MQTT address
         self.broker='13.73.184.147'
+        
 
+        #Only used by listenscrapers if verbose is on.
         self.i=0
 
 
-    def listenscrapers(self,save=True,forever=True):
+    def listenscrapers(self,save=True,forever=True,verbose=False):
         """
         Select "save" if you want the data to be saved on the SQL database, otherwise this code
         will only print the messages it receives.
 
         Select "forever" if you want the "listen" function to run forever - it might be useful if you
         expect a lot of messages, but it does consume some RAM (and we only have 1gb on this machine :P )
+
+        Verbose will just notify you when you receive a message on the MQTT
         """
 
         #mqtt connecter
@@ -49,6 +53,7 @@ class mqtttosql:
 
         #This function specifies what happens every time we receive a message on the mqtt topic scraper/"name of the crypto"
         def on_message(client, userdata, msg):
+
 
             
             #if save is set to "False", this code will print the message and stop the function.
@@ -67,8 +72,10 @@ class mqtttosql:
                 print('There is a problem with the formatting of the values of this message')
                 return None
 
-            print(self.i,coin, datetime.datetime.now())
-            self.i+=1
+            
+            if verbose:
+                print('id: ',self.i,coin,datetime.datetime.now())
+                self.i+=1
 
             # Our API, by default, sends us their most recent price data.
             # This checks that our data actually comes from midnight.
@@ -123,8 +130,11 @@ class mqtttosql:
         rows for each given coin, delete the oldest record by marking its deleted column as deleted.
         """  
 
+        #We select all coins in the database
         cryptosquery=self.sqlexecute("SELECT DISTINCT coin FROM dbo.pricedata")
         cryptos=[i[0] for i in cryptosquery.fetchall()]
+
+        #Actual updater, it's mostly SQL.
         for coin in cryptos:
             updated=False
             while not updated:
@@ -139,10 +149,9 @@ class mqtttosql:
                     updated=True
 
     
-
-
-mqttsubber=mqtttosql()
-mqttsubber.listenscrapers(forever=False)
-mqttsubber.sqlupdater()
+if __name__ == "__main__":
+    mqttsubber=mqtttosql()
+    mqttsubber.listenscrapers(forever=False)
+    mqttsubber.sqlupdater()
 
 
