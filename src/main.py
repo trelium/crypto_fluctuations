@@ -5,7 +5,7 @@ from scraper_mqtt_sql import *
 
 
 def apiscraper(coinlist=['bitcoin', 'ripple', 'ethereum','binancecoin','dogecoin']):
-    scraper=pricescraper(coinlist)
+    scraper=pricescraper(coinlist,analyzeddays=200)
     scraper.scrapepricedata()
 
 def listener():

@@ -24,6 +24,7 @@ def sanitizecoininput(analyzedcryptos):
     
     ret=[]
 
+
     for crypto in cryptos:
         crypto=crypto.lower()
         if crypto in tempid:
@@ -35,4 +36,3 @@ def sanitizecoininput(analyzedcryptos):
 
     
     return ret
-

@@ -1,7 +1,8 @@
 sub:
 mosquitto_sub -t "test"
 mosquitto_sub -h localhost -t /home/sensors/temp/# 
-mosquitto_sub -h 51.144.5.107 -p 1883 -t "#"
+mosquitto_sub -h 13.73.184.147 -p 1883 -t "#"
+mosquitto_sub -h 13.73.184.147 -p 1883 -t "#" -q 1 -c -i MYNAME
 
 pub: 
 mosquitto_pub -m "message from mosquitto_pub client" -t "test"

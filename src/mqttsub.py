@@ -60,11 +60,12 @@ class mqtttosql:
                 return None
 
             # Here we format the message we are receiving to prepare it to be sent to the SQL.
+            # The formatting is fairly efficient, allowing for fast processing
             try:
                 templist=str(msg.payload)[3:-2].split(', ')
                 temptime=int(templist[0])
                 tempprice=float(templist[1])
-                coin=msg.topic[msg.topic.rfind('/')+1:]
+                coin=msg.topic[8:]
                 deleted=0
             except:
                 print('There is a problem with the formatting of the values of this message')
@@ -81,21 +82,21 @@ class mqtttosql:
                 return None
 
 
-            #IF the value is already inserted in the SQL, don't add it again, otherwise, add it.
-            if len(self.sqlexecute("SELECT * FROM dbo.pricedata WHERE timevalue={} AND coin LIKE '{}';".format(temptime,coin)).fetchall())!=0:
-                return None        
-            else:
-                #print(coin,temptime,tempprice,deleted)
-                #print("'{}',{},{},{}".format(coin,temptime,tempprice,deleted))
-                self.sqlexecute("""INSERT INTO dbo.pricedata VALUES('{}',{},{},{});""".format(coin,temptime,tempprice,deleted),
-                commit=True)
-
-
+            # #IF the value is already inserted in the SQL, don't add it again, otherwise, add it.
+            # if len(self.sqlexecute("SELECT * FROM dbo.pricedata WHERE timevalue={} AND coin LIKE '{}';".format(temptime,coin)).fetchall())!=0:
+            #     return None        
+            # else:
+            #     #print(coin,temptime,tempprice,deleted)
+            #     #print("'{}',{},{},{}".format(coin,temptime,tempprice,deleted))
+            #     self.sqlexecute("""INSERT INTO dbo.pricedata VALUES('{}',{},{},{});""".format(coin,temptime,tempprice,deleted),
+            #     commit=True)
 
 
         #MQTT connector
         client = mqtt.Client(client_id="priceSQL_push")
         client.connect(self.broker, 1883, 60)
+
+        #callback_mutex is there to eventually implement multithreading if necessary.
         with client._callback_mutex:
             client._on_message=on_message
         #client.on_message = on_message
@@ -125,7 +126,7 @@ class mqtttosql:
 
         return self.cursor
 
-    sqlexecute(commit,j,))
+    #sqlexecute(commit,j,))
 
     def sqlupdater(self):
         """
@@ -154,7 +155,7 @@ class mqtttosql:
     
 if __name__ == "__main__":
     mqttsubber=mqtttosql()
-    mqttsubber.listenscrapers(forever=False,verbose=True,save=True)
-    mqttsubber.sqlupdater()
+    mqttsubber.listenscrapers(forever=False,verbose=True,save=False)
+    #mqttsubber.sqlupdater()
 
 

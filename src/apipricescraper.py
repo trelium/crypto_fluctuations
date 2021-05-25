@@ -10,7 +10,7 @@ class pricescraper:
     MQTT server.
     """
 
-    def __init__(self,analyzedcryptos,analyzeddays=200,projectbroker='13.73.184.147'):
+    def __init__(self,analyzedcryptos,analyzeddays=200,projectbroker='13.73.184.147',confirmdays='y'):
 
         # list of all cryptos that we are interested in. 
         # the list must contain the correct coin id to work
@@ -24,15 +24,15 @@ class pricescraper:
             if int(analyzeddays)<=90:
 
                 #This long string is here to inform the user that this software has been designed to work with daily data.
-                #As such, selecting hourly data might cause problems to the SQL analysis.
-                #The SQL DOES check if the data comes from midnight, so everything might still work. But it is untested.
-                confirmdays=input(
-                """Are you sure you want to scrape less than 90 days?
-                Please consider that, while the scraping will work just fine, the SQL has been designed to
-                work with daily data and as such there might be errors. Are you sure you want to proceed? (Y/N)  """)
+                #While selecting hourly data this code will still work and the data will be published
+                #to the correct MQTT topic. That said, the subscriber will refuse the data and will not push it
+                #in the SQL.
+
+                #Confirmdays is one of the arguments of the function.
+                #It's there to make sure that the user is aware of the subscriber limitation.
+                
                 confirmdays=confirmdays.lower()
                 if 'y' in confirmdays:
-                    print('yes!')
                     self.days=int(analyzeddays)
                 else:
                     self.days=200
@@ -66,7 +66,7 @@ class pricescraper:
         #This here is pretty simple: it requests the data to the API and sends them to the MQTT
         
         self.objconnect()
-
+        self.client.loop_start()
         for crypto in self.cryptos:
             response= requests.get("https://api.coingecko.com/api/v3/coins/"+crypto+"/market_chart?vs_currency=usd&days="+str(self.days))
             response=response.json()
@@ -79,7 +79,10 @@ class pricescraper:
                 #This is because the SQL server that we are using is quite slow and the MQTT is not retaining the messages.
                 #This gives more time to the sub code to actually work out everything.
                 #I will try to make the sub code more efficient.
-                time.sleep(0.25)
+                #time.sleep(0.25)
+
+        self.client.loop_stop()
+
     
     def mqttpublisher(self,crypto,pricedatapoint):
         #quite simple: the mqtt publisher
@@ -87,8 +90,9 @@ class pricescraper:
             raise Exception('The object is not connected to a mqtt broker.')
 
         path='scraper/'+crypto
-        self.client.publish(path,str(pricedatapoint), qos=0)
-
+        self.client.publish(path,str(pricedatapoint), qos=1)
+        
+        
 
 if __name__ == "__main__":
     mainscraper=pricescraper(['bitcoin', 'ripple', 'ethereum','binancecoin','dogecoin'])
