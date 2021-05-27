@@ -18,12 +18,13 @@ def sanitizecoininput(analyzedcryptos):
     tempid=set()
     tempsymbol={}
 
+
+
     for i in response:
         tempid.add(i['id'])
         tempsymbol[i['symbol']]=i['id']
     
     ret=[]
-
 
     for crypto in cryptos:
         crypto=crypto.lower()

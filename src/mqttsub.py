@@ -1,7 +1,10 @@
+from typing import final
 import pyodbc
 import paho.mqtt.client as mqtt
 import time
 import datetime
+from queue import SimpleQueue
+
 
 class mqtttosql:
     """
@@ -30,6 +33,11 @@ class mqtttosql:
 
         #Only used by listenscrapers if verbose is on. Useful for debuging.
         self.i=0
+
+
+        #This program uses a Python queue to operate: note that python queue are optimized
+        #for large amount of data and multithreading, as such, they are fairly scalable.
+        self.myqueue=SimpleQueue()
 
 
     def listenscrapers(self,save=True,forever=True,verbose=False):
@@ -73,7 +81,7 @@ class mqtttosql:
 
             
             if verbose:
-                print('id: ',self.i,coin,datetime.datetime.now())
+                print('id: ',self.i,msg.topic[8:],datetime.datetime.now())
                 self.i+=1
 
             # Our API, by default, sends us their most recent price data.
@@ -81,15 +89,9 @@ class mqtttosql:
             if str(temptime)[-5:]!='00000':
                 return None
 
+            self.myqueue.put(f"('{coin}',{temptime},{tempprice},{deleted})")
 
-            # #IF the value is already inserted in the SQL, don't add it again, otherwise, add it.
-            # if len(self.sqlexecute("SELECT * FROM dbo.pricedata WHERE timevalue={} AND coin LIKE '{}';".format(temptime,coin)).fetchall())!=0:
-            #     return None        
-            # else:
-            #     #print(coin,temptime,tempprice,deleted)
-            #     #print("'{}',{},{},{}".format(coin,temptime,tempprice,deleted))
-            #     self.sqlexecute("""INSERT INTO dbo.pricedata VALUES('{}',{},{},{});""".format(coin,temptime,tempprice,deleted),
-            #     commit=True)
+
 
 
         #MQTT connector
@@ -105,7 +107,7 @@ class mqtttosql:
         #Checks if the Forever argument is true or false
         if forever==False:
             client.loop_start()
-            time.sleep(600)
+            time.sleep(15)
             client.loop_stop()
         else:
             client.loop_start()
@@ -126,7 +128,16 @@ class mqtttosql:
 
         return self.cursor
 
-    #sqlexecute(commit,j,))
+    def sqlinserter(self):
+        
+        valuelst=[]
+        #We're using a list to make appends because append in python has complexity O(1)
+        while self.myqueue.empty()==False:
+            tempvalue=self.myqueue.get()
+            valuelst.append(tempvalue)
+
+        finalquery='INSERT INTO dbo.pricedata VALUES '+(','.join(valuelst))+';'
+        self.sqlexecute(finalquery,commit=True)
 
     def sqlupdater(self):
         """
@@ -155,7 +166,8 @@ class mqtttosql:
     
 if __name__ == "__main__":
     mqttsubber=mqtttosql()
-    mqttsubber.listenscrapers(forever=False,verbose=True,save=False)
+    mqttsubber.listenscrapers(forever=False,verbose=True,save=True)
+    mqttsubber.sqlinserter()
     #mqttsubber.sqlupdater()
 
 

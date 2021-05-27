@@ -125,7 +125,7 @@ class mqtttosql:
 
         return self.cursor
 
-    sqlexecute(commit,j,))
+    #sqlexecute(commit,j,))
 
     def sqlupdater(self):
         """

@@ -18,10 +18,11 @@ start: mosquitto -v
 
 CREATE TABLE pricedata(
 id int IDENTITY(1,1) PRIMARY KEY,
-coin VARCHAR(MAX) NOT NULL,
+coin VARCHAR(255) NOT NULL,
 timevalue BIGINT NOT NULL,   
 price FLOAT NOT NULL,
 deleted BIT NOT NULL
+CONSTRAINT controllaunico UNIQUE (coin,timevalue,price)
 );
 
 
