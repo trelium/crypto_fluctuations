@@ -1,6 +1,6 @@
 import requests
 import paho.mqtt.client as mqtt
-import time
+from datetime import datetime
 from projecttoolbox import *
 
 
@@ -10,29 +10,28 @@ class pricescraper:
     MQTT server.
     """
 
-    def __init__(self,analyzedcryptos,analyzeddays=200,projectbroker='13.73.184.147',confirmdays='y'):
+    def __init__(self,analyzedcryptos,analyzeddays=200,projectbroker='13.73.184.147'):
 
         # list of all cryptos that we are interested in. 
         # the list must contain the correct coin id to work
         # To get a list of all coin IDs, the request url is "https://api.coingecko.com/api/v3/coins/list"
-        
         self.cryptos=sanitizecoininput(analyzedcryptos)
 
         # Warning: due to the automatic granularity of the API, daily data will be used for duration above 90 days.
         # Hourly data will be used for duration between 1 day and 90 days.
         if type(analyzeddays)==int or type(analyzeddays)==float:
             if int(analyzeddays)<=90:
-
-                #This long string is here to inform the user that this software has been designed to work with daily data.
-                #While selecting hourly data this code will still work and the data will be published
-                #to the correct MQTT topic. That said, the subscriber will refuse the data and will not push it
-                #in the SQL.
-
-                #Confirmdays is one of the arguments of the function.
-                #It's there to make sure that the user is aware of the subscriber limitation.
                 
+                confirmdays=input("""
+                This software has been designed to work with daily data.
+                By selecting less than 90 days, you WILL be selecting hourly data due to the automatic granularity of the API.
+                By selecting hourly data this code will still work and the data will be published
+                to the correct MQTT topic. That said, the subscriber will refuse the data and will not push it in the SQL.
+                Are you sure you want to proceed in selecting less than 90 days? (Y/N)
+                """)
                 confirmdays=confirmdays.lower()
                 if 'y' in confirmdays:
+                    print('ok')
                     self.days=int(analyzeddays)
                 else:
                     self.days=200
@@ -43,7 +42,7 @@ class pricescraper:
 
 
         #mqtt connecter
-        #oldip:13.73.184.147
+        #ip:13.73.184.147
         self.broker=projectbroker
         self.client=None
         self.connected=False
@@ -63,29 +62,20 @@ class pricescraper:
 
 
     def scrapepricedata(self):
-        #This here is pretty simple: it requests the data to the API and sends them to the MQTT
-        
+        #This code requests the data to the API and sends them to the MQTT
         self.objconnect()
         self.client.loop_start()
         for crypto in self.cryptos:
             response= requests.get("https://api.coingecko.com/api/v3/coins/"+crypto+"/market_chart?vs_currency=usd&days="+str(self.days))
             response=response.json()
-
             for pricedatapoint in response['prices']:
                 self.mqttpublisher(crypto,pricedatapoint)
-                #This time.sleep might be the biggest limit to the scalability of the code.
-                #I noticed that if we send a lot of messages at the same, the "sub" part of the code
-                #Will lose some of the data while it writes on the SQL. 
-                #This is because the SQL server that we are using is quite slow and the MQTT is not retaining the messages.
-                #This gives more time to the sub code to actually work out everything.
-                #I will try to make the sub code more efficient.
-                #time.sleep(0.25)
 
         self.client.loop_stop()
 
     
     def mqttpublisher(self,crypto,pricedatapoint):
-        #quite simple: the mqtt publisher
+        #the actual mqtt publisher
         if self.connected==False:
             raise Exception('The object is not connected to a mqtt broker.')
 
@@ -95,20 +85,12 @@ class pricescraper:
         
 
 if __name__ == "__main__":
-    mainscraper=pricescraper(['bitcoin', 'ripple', 'ethereum','binancecoin','dogecoin'])
+    print(datetime.now())
+    #mainscraper=pricescraper(['bitcoin','dogecoin','eth','LTC','ADA','DOT','BCH','BNB','XLM','Chainlink'])
+    mainscraper=pricescraper(['bitcoin','eth','chainlink','XLM'],analyzeddays=200)
     mainscraper.scrapepricedata()
 
 # the mqtt topic where things are being published is scraper/nomecrypto.
-# nel caso del bitcoin: scraper/bitcoin
+# for example, by publishing bitcoin data the topic will be: scraper/bitcoin
 
 
-#Crontab notes:
-# Per impostare il crontab che runna a mezzanotte di questo programma:
-# 0 22 * * * python /home/bdtstudent/MainProject/crypto_fluctuations/src/apipricescraper.py >/dev/null 2>&1
-# 22^ perché di default crontab usa l'utc
-
-# se non sai usare crontab: premi crontab -e per vedere tutti i vari programmi
-# ed i loro orari.
-
-# Per cancellare tutti i crontab:
-# crontab -r

@@ -1,4 +1,3 @@
-from typing import final
 import pyodbc
 import paho.mqtt.client as mqtt
 import time
@@ -31,7 +30,8 @@ class mqtttosql:
         self.broker='13.73.184.147'
         
 
-        #Only used by listenscrapers if verbose is on. Useful for debuging.
+        #Only used by listenscrapers if verbose is on. Useful for debugging, because it checks
+        #how many (and which) message the sub has received
         self.i=0
 
 
@@ -46,7 +46,7 @@ class mqtttosql:
         will only print the messages it receives.
 
         Select "forever" if you want the "listen" function to run forever - it might be useful if you
-        expect a lot of messages, but it does consume some RAM (and we only have 1gb on this machine :P )
+        expect a lot of messages, but it does consume some RAM (and we only have 1gb on this Azure machine :P )
 
         Verbose will just notify you when you receive a message on the MQTT
         """
@@ -89,13 +89,13 @@ class mqtttosql:
             if str(temptime)[-5:]!='00000':
                 return None
 
-            self.myqueue.put(f"('{coin}',{temptime},{tempprice},{deleted})")
-
-
+            #This is the end of the "on message" sequence: we push our formatted tuple in a FIFO queue
+            self.myqueue.put(tuple([coin,temptime,tempprice,deleted]))
 
 
         #MQTT connector
-        client = mqtt.Client(client_id="priceSQL_push")
+        client = mqtt.Client()
+        #client_id="priceSQL_push"
         client.connect(self.broker, 1883, 60)
 
         #callback_mutex is there to eventually implement multithreading if necessary.
@@ -107,7 +107,7 @@ class mqtttosql:
         #Checks if the Forever argument is true or false
         if forever==False:
             client.loop_start()
-            time.sleep(15)
+            time.sleep(60)
             client.loop_stop()
         else:
             client.loop_start()
@@ -129,15 +129,39 @@ class mqtttosql:
         return self.cursor
 
     def sqlinserter(self):
-        
-        valuelst=[]
+        """
+        This is the part of the code that takes messages from the queue and pushes them to the SQL.
+        It requires no argument, given that the queue is already present in our class.
+        """
+
         #We're using a list to make appends because append in python has complexity O(1)
+        index=0
+        valuelst=[]
         while self.myqueue.empty()==False:
             tempvalue=self.myqueue.get()
-            valuelst.append(tempvalue)
 
-        finalquery='INSERT INTO dbo.pricedata VALUES '+(','.join(valuelst))+';'
-        self.sqlexecute(finalquery,commit=True)
+            #IF the value is already inserted in the SQL, don't add it again, otherwise, add it.
+            if len(self.sqlexecute(f"SELECT * FROM dbo.pricedata WHERE timevalue={tempvalue[1]} AND coin LIKE '{tempvalue[0]}';").fetchall())!=0:
+                continue       
+            
+            # We noticed our SQL INSERT query has some problems after 1000 values, as such we're splitting
+            # the task and doing multiple inserts of 950 values.
+            if index<950: 
+                index+=1
+                valuelst.append(str(tempvalue))
+            else:
+                index=0
+                finalquery='INSERT INTO dbo.pricedata VALUES '+(','.join(valuelst))+';'
+                self.sqlexecute(finalquery,commit=True)
+                valuelst=[]
+
+        # Given that our queue rarely has multiple of 980 elements, we'll do a final push by 
+        # selecting the remaining messages.
+        if len(valuelst)>0:
+            finalquery='INSERT INTO dbo.pricedata VALUES '+(','.join(valuelst))+';'
+            self.sqlexecute(finalquery,commit=True)
+            valuelst=[]
+
 
     def sqlupdater(self):
         """
@@ -165,9 +189,10 @@ class mqtttosql:
 
     
 if __name__ == "__main__":
+
     mqttsubber=mqtttosql()
-    mqttsubber.listenscrapers(forever=False,verbose=True,save=True)
+    #mqttsubber.listenscrapers(forever=False,verbose=True,save=True)
     mqttsubber.sqlinserter()
     #mqttsubber.sqlupdater()
-
+    
 

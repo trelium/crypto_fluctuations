@@ -16,19 +16,36 @@ se non funziona: " killall mosquitto " e poi " sudo service mosquitto stop "
 start: mosquitto -v
 
 
+------
+SQL pricedata create query :
+
 CREATE TABLE pricedata(
 id int IDENTITY(1,1) PRIMARY KEY,
 coin VARCHAR(255) NOT NULL,
 timevalue BIGINT NOT NULL,   
 price FLOAT NOT NULL,
 deleted BIT NOT NULL
-CONSTRAINT controllaunico UNIQUE (coin,timevalue,price)
 );
 
+if you want the constraint:
+CONSTRAINT controllaunico UNIQUE (coin,timevalue,price)
 
 
-#ubuntu wsl:
-
-restart:
+#ubuntu wsl commands:
+restart: (in the windows cmd, opened by an administrator)
 net stop LxssManager
 net start LxssManager
+
+
+
+
+#Crontab notes:
+# Per impostare il crontab che runna a mezzanotte di questo programma:
+# 0 22 * * * python /home/bdtstudent/MainProject/crypto_fluctuations/src/apipricescraper.py >/dev/null 2>&1
+# 22^ perché di default crontab usa l'utc
+
+# se non sai usare crontab: premi crontab -e per vedere tutti i vari programmi
+# ed i loro orari.
+
+# Per cancellare tutti i crontab:
+# crontab -r
