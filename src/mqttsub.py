@@ -45,8 +45,7 @@ class mqtttosql:
         Select "save" if you want the data to be saved on the SQL database, otherwise this code
         will only print the messages it receives.
 
-        Select "forever" if you want the "listen" function to run forever - it might be useful if you
-        expect a lot of messages, but it does consume some RAM (and we only have 1gb on this Azure machine :P )
+        Select "forever" if you want the "listen" function to run forever)
 
         Verbose will just notify you when you receive a message on the MQTT
         """
@@ -55,7 +54,7 @@ class mqtttosql:
         def on_connect(client, userdata, flags, rc):
             if rc==0:
                 print("connected OK Returned code=",rc)
-                client.subscribe("scraper/#",qos=1)
+                client.subscribe("scraper/#",1)
             else:
                 print("Bad connection Returned code=",rc)
 
@@ -94,7 +93,7 @@ class mqtttosql:
 
 
         #MQTT connector
-        client = mqtt.Client()
+        client = mqtt.Client(client_id="priceSQL_push")
         #client_id="priceSQL_push"
         client.connect(self.broker, 1883, 60)
 
@@ -107,7 +106,7 @@ class mqtttosql:
         #Checks if the Forever argument is true or false
         if forever==False:
             client.loop_start()
-            time.sleep(60)
+            time.sleep(600)
             client.loop_stop()
         else:
             client.loop_start()
@@ -191,8 +190,8 @@ class mqtttosql:
 if __name__ == "__main__":
 
     mqttsubber=mqtttosql()
-    #mqttsubber.listenscrapers(forever=False,verbose=True,save=True)
+    mqttsubber.listenscrapers(forever=False,verbose=True,save=False)
     mqttsubber.sqlinserter()
-    #mqttsubber.sqlupdater()
+    mqttsubber.sqlupdater()
     
 
