@@ -17,58 +17,61 @@ from datetime import datetime
 from telegram.ext import * 
 import re
 from Requester import UtentiSQL
+from projecttoolbox import sanitizecoininput
+from dotenv import load_dotenv
+import os
 
-
+load_dotenv()
+KEY = os.environ.get("KEY")
 #keys need to be stored out of code: solution 1 is to encrypt the strings and save the encrypted version in a file. The python script needs to have a key for decoding. 
 #solution 2 is to simpy create a file where they are written clear-text. store your passwords unencrypted on disk, protected only by filesystem permissions. If this is not an acceptable security tradeoff,
 #solution 3 is using keyring
-KEY = '1768128147:AAEHVzQup7zLKoEAQPOv7F1sMC-uOO8eeuw'
 
 db = UtentiSQL()
 
 def setting_routine(input_text):
+    errorcoin = None
     def extract_coinpct (inputpreference, user_dict):
-        allowedcoins = set(('bitcoin', 'ripple', 'ethereum','binancecoin','dogecoin'))
         substr = inputpreference.split('@')
         if re.match('-{0,1}[0-9]+\.{0,1}[0-9]*%{0,1}', substr[1].replace(' ','')):
             foundpct = float(re.findall('-{0,1}[0-9]+\.{0,1}[0-9]*%{0,1}', substr[1]).pop().rstrip('%'))
-            coinname = substr[0].replace(' ','')
-            if coinname in allowedcoins:
-                user_dict[coinname] = foundpct
-            else:
-                return ValueError
         elif re.match('-{0,1}[0-9]+,{0,1}[0-9]*%{0,1}', substr[1].replace(' ','')): #changes only a comma from previous regex
             foundpct = float(re.findall('-{0,1}[0-9]+,{0,1}[0-9]*%{0,1}', substr[1]).pop().rstrip('%'))
-            coinname = substr[0].replace(' ','')
-            if coinname in allowedcoins:
-                user_dict[coinname] = foundpct
-            else:
-                return ValueError
         else:
-            return ValueError 
-        return user_dict
+            raise ValueError 
+        
+        coinname = substr[0].replace(' ','')
+        try:
+            coinname = sanitizecoininput(coinname)[0]
+            user_dict[coinname] = foundpct
+            return user_dict
+        except:
+            nonlocal errorcoin
+            errorcoin = coinname
+            raise ValueError
+        
 
     user_preferences = dict()
     user_message = str(input_text).lower()
 
     if ';' in user_message: 
         user_message = user_message.split(';')
-        for preference in user_message:
-            try:
-                user_preferences = extract_coinpct(preference,user_preferences)
-            except:
-                return ('Please start over. Type your preferences with the correct syntax', {})
-        return ('Preferences correctly imported!', user_preferences)
     else:
+        user_message = [user_message]
+    for preference in user_message:
         try:
-            user_preferences = extract_coinpct(user_message,user_preferences)
+            user_preferences = extract_coinpct(preference,user_preferences)
         except:
-            return ('Please start over. Type your preferences with the correct syntax', {})
-        return ('Preferences correctly imported!', user_preferences)
+            if errorcoin != None:
+                return (f'The coin "{errorcoin}" is not currently supported.\nPlease refer to https://api.coingecko.com/api/v3/coins/list for a complete list of supported coins.', {})
+            else:
+                return (f'Please, type your preferences with the correct syntax.', {})
+    return ('Preferences correctly imported!', user_preferences)
+    
 
 def start_command(update, context):
     user = update.message.from_user
-    if not db.is_already_present(chat = str(update.message.chat.id)) or db.get_state(chat = str(update.message.chat.id)) == 'setting':
+    if not db.is_already_present(chat = str(update.message.chat.id)) or db.get_state(chat = str(update.message.chat.id)) == 'setting': #TODO second condition does not seem to work 
         settings_command(update, context)
     elif db.get_state(chat = str(update.message.chat.id)) == False:
         update.message.reply_text('Error starting service. Please contact the admin')
@@ -106,9 +109,7 @@ def handle_message(update, context):
         update.message.reply_text(response) #send response 
         if len(dizionario) != 0:
             db.set_preferences(chat = str(update.message.chat.id), preferences = dizionario) #TODO change format
-            print('ok')
-            print(type(update))
-            print(update.message.chat.username)
+            #print(update.message.chat.username) #debug only
             db.set_state(chat = str(update.message.chat.id), user = str(update.message.chat.username), state = 'ready')
             update.message.reply_text('You are ready to receive notifications. Issue command /start to activate the service.') 
     else: 
@@ -117,7 +118,7 @@ def handle_message(update, context):
 def error(update,context):
     print('Update \n {} \n  caused error: \n {}'.format(update, context.error))
 
-def main(): #proper way to do this would be to use a conversationHandler 
+def main(): #Note: conversationHandler 
     print('Bot started')
     updater = Updater(KEY, use_context=True)
     dp = updater.dispatcher
