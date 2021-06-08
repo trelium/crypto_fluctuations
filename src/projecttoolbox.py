@@ -29,9 +29,12 @@ def sanitizecoininput(analyzedcryptos):
     for crypto in cryptos:
         crypto=crypto.lower()
         if crypto in tempid:
-            ret.append(crypto)
+            if crypto not in ret:
+                ret.append(crypto)
         elif crypto in tempsymbol:
             ret.append(tempsymbol[crypto])
+        
+        
         else:
             raise ValueError(f"\nThe '{crypto}' cryptocurrency is not listed in the coin list of CoinGecko.\nPlease refer to https://api.coingecko.com/api/v3/coins/list for a complete list of supported coins.")
 
@@ -42,3 +45,5 @@ def sanitizecoininput(analyzedcryptos):
 #If you want to test the sanitizer:
 #print(sanitizecoininput(['bitCoin','eTh','LTc']))
 #print(sanitizecoininput('parola')) <= Will raise an error
+print(sanitizecoininput(['bitcoin','bitcoin']))
+

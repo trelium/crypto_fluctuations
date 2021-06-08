@@ -190,7 +190,7 @@ class mqtttosql:
 if __name__ == "__main__":
 
     mqttsubber=mqtttosql()
-    mqttsubber.listenscrapers(forever=False,verbose=True,save=False)
+    mqttsubber.listenscrapers(forever=False,verbose=True,save=True)
     mqttsubber.sqlinserter()
     mqttsubber.sqlupdater()
     
