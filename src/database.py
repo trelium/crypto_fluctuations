@@ -171,15 +171,15 @@ class UsersSQL():
         This function returns a set of all the coins that the users want to be updated about.
         Each coin is listed only once, without information about price threesolds or users. 
         """
-        self.cursor.execute("""SELECT coin_1 FROM dbo.utenti_bot WHERE coin_1 IS NOT NULL
+        self.cursor.execute("""SELECT coin_1 FROM dbo.users WHERE coin_1 IS NOT NULL
                                 UNION
-                                SELECT coin_2 FROM dbo.utenti_bot WHERE coin_2 IS NOT NULL
+                                SELECT coin_2 FROM dbo.users WHERE coin_2 IS NOT NULL
                                 UNION
-                                SELECT coin_3 FROM dbo.utenti_bot WHERE coin_3 IS NOT NULL
+                                SELECT coin_3 FROM dbo.users WHERE coin_3 IS NOT NULL
                                 UNION
-                                SELECT coin_4 FROM dbo.utenti_bot WHERE coin_4 IS NOT NULL
+                                SELECT coin_4 FROM dbo.users WHERE coin_4 IS NOT NULL
                                 UNION
-                                SELECT coin_5 FROM dbo.utenti_bot WHERE coin_5 IS NOT NULL""")
+                                SELECT coin_5 FROM dbo.users WHERE coin_5 IS NOT NULL""")
 
         #a set is used for efficiency
         ret=set()
