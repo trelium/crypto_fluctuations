@@ -24,6 +24,7 @@ import requests
 import paho.mqtt.client as mqtt
 from datetime import datetime
 from projecttoolbox import *
+from database import UsersSQL
 from dotenv import load_dotenv
 import os
 
@@ -111,10 +112,17 @@ class PriceScraper:
         
 
 if __name__ == "__main__":
-    print(datetime.now())
-    mainscraper=PriceScraper(['bitcoin','XRP','Tether','dogecoin','eth','LTC','ADA','DOT','BCH','BNB','XLM','Chainlink'],analyzeddays=210)
+    print(datetime.now()) # <- used for debugging
+
+    # Connects to the SQL utentibot to get a list of every coin the users are interested in.
+    users=UsersSQL()
+    userspreferences=users.get_preferences()
+
+    mainscraper=PriceScraper(userspreferences)
+
+
+    #mainscraper=PriceScraper(['bitcoin','XRP','Tether','dogecoin','eth','LTC','ADA','DOT','BCH','BNB','XLM','Chainlink'],analyzeddays=210)
     #mainscraper=PriceScraper(['bitcoin','eth','chainlink','XLM','dogecoin','LTC'],analyzeddays=200)
-    #mainscraper=PriceScraper('bitcoin')
     mainscraper.scrapepricedata()
 
 # the mqtt topic where things are being published is scraper/nomecrypto.

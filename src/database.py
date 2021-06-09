@@ -165,8 +165,31 @@ class UsersSQL():
                 
         except:
             raise ValueError()
-            
 
+    def get_preferences(self):
+        """
+        This function returns a set of all the coins that the users want to be updated about.
+        Each coin is listed only once, without information about price threesolds or users. 
+        """
+        self.cursor.execute("""SELECT coin_1 FROM dbo.utenti_bot WHERE coin_1 IS NOT NULL
+                                UNION
+                                SELECT coin_2 FROM dbo.utenti_bot WHERE coin_2 IS NOT NULL
+                                UNION
+                                SELECT coin_3 FROM dbo.utenti_bot WHERE coin_3 IS NOT NULL
+                                UNION
+                                SELECT coin_4 FROM dbo.utenti_bot WHERE coin_4 IS NOT NULL
+                                UNION
+                                SELECT coin_5 FROM dbo.utenti_bot WHERE coin_5 IS NOT NULL""")
+
+        #a set is used for efficiency
+        ret=set()
+        
+        #adds each preferred crypto to the set
+        for i in self.cursor.fetchall():
+            ret.add(i[0])
+        
+        #converts the set in a list and returns it.
+        return list(ret)
 
 class PricesSQL():
     """
