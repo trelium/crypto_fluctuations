@@ -190,12 +190,12 @@ class PricesSQL():
         present_tables = self.cursor.fetchall()
         if not 'priceshistory' in [elem for sublist in present_tables for elem in sublist]: #True if table is present
             self.cursor.execute("""CREATE TABLE pricehistory(
-        id int IDENTITY(1,1) PRIMARY KEY,
-        coin VARCHAR(255) NOT NULL,
-        timevalue BIGINT NOT NULL,   
-        price FLOAT NOT NULL,
-        deleted BIT NOT NULL
-        CONSTRAINT controllaunico UNIQUE (coin,timevalue,price));""") #TODO correct datatypes
+                                id int IDENTITY(1,1) PRIMARY KEY,
+                                coin VARCHAR(255) NOT NULL,
+                                timevalue BIGINT NOT NULL,   
+                                price FLOAT NOT NULL,
+                                deleted BIT NOT NULL
+                                CONSTRAINT controllaunico UNIQUE (coin,timevalue,price));""") #TODO correct datatypes
 
     def execute_query(self,query:str(),commit=False):
         """
