@@ -189,12 +189,13 @@ class PricesSQL():
         self.cursor.execute("""SELECT  table_name name FROM INFORMATION_SCHEMA.TABLES """)
         present_tables = self.cursor.fetchall()
         if not 'priceshistory' in [elem for sublist in present_tables for elem in sublist]: #True if table is present
-            self.cursor.execute("""CREATE TABLE priceshistory 
-            (id VARCHAR(300), 
-            coin VARCHAR(255), 
-            timevalue BIGINT, 
-            price FLOAT, 
-            deleted BIT);""") #TODO correct datatypes
+            self.cursor.execute("""CREATE TABLE pricehistory(
+id int IDENTITY(1,1) PRIMARY KEY,
+coin VARCHAR(255) NOT NULL,
+timevalue BIGINT NOT NULL,   
+price FLOAT NOT NULL,
+deleted BIT NOT NULL
+CONSTRAINT controllaunico UNIQUE (coin,timevalue,price));""") #TODO correct datatypes
 
     def execute_query(self,query:str(),commit=False):
         """
@@ -216,10 +217,10 @@ class PricesSQL():
         Returns:
             :Bool: True/False 
         """
-        return len(self.execute_query(f"SELECT * FROM dbo.pricedata WHERE timevalue={timevalue} AND coin LIKE '{coinname}';").fetchall())!=0
+        return len(self.execute_query(f"SELECT * FROM dbo.priceshistory WHERE timevalue={timevalue} AND coin LIKE '{coinname}';").fetchall())!=0
 
     def insert_price_values(self,prices:list()):
-        self.execute_query('INSERT INTO dbo.pricedata VALUES '+(','.join(prices))+';', commit=True)
+        self.execute_query('INSERT INTO dbo.priceshistory VALUES '+(','.join(prices))+';', commit=True)
         return
     
     def update_time_window(self):
@@ -231,18 +232,18 @@ class PricesSQL():
         """  
 
         #We select all coins in the database
-        cryptosquery=self.execute_query("SELECT DISTINCT coin FROM dbo.pricedata")
+        cryptosquery=self.execute_query("SELECT DISTINCT coin FROM dbo.priceshistory")
         cryptos=[i[0] for i in cryptosquery.fetchall()]
 
         #Actual updater
         for coin in cryptos:
             updated=False
             while not updated:
-                if len(self.execute_query("SELECT * FROM dbo.pricedata WHERE coin LIKE '{}' AND deleted=0;".format(coin)).fetchall())>200:
+                if len(self.execute_query("SELECT * FROM dbo.priceshistory WHERE coin LIKE '{}' AND deleted=0;".format(coin)).fetchall())>200:
                     self.execute_query("""
-                    UPDATE dbo.pricedata SET deleted=1 WHERE id=(
-                    SELECT id FROM dbo.pricedata WHERE 
-                    timevalue=(SELECT MIN(timevalue) FROM dbo.pricedata WHERE coin LIKE '{}' AND deleted=0)
+                    UPDATE dbo.priceshistory SET deleted=1 WHERE id=(
+                    SELECT id FROM dbo.priceshistory WHERE 
+                    timevalue=(SELECT MIN(timevalue) FROM dbo.priceshistory WHERE coin LIKE '{}' AND deleted=0)
                     AND coin LIKE '{}'
                     );""".format(coin,coin),True)
                 else:

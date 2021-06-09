@@ -19,8 +19,6 @@ class MqttSQL:
 
     def __init__(self):
 
-<<<<<<< HEAD
-=======
         #Our Server information
         self.server = os.environ.get("SQL_SERVER")  #collation: SQL_Latin1_General_CP1_CI_AS
         self.database = os.environ.get("SQL_DATABASE")
@@ -33,7 +31,6 @@ class MqttSQL:
         self.cnxn.setencoding('utf-8')
         self.cursor=self.cnxn.cursor()
 
->>>>>>> 048bb48073c128c63ce40712c4d8991700a7dbd4
         #MQTT address
         self.broker = os.environ.get("BROKER_ADDRESS")
         
