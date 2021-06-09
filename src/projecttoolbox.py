@@ -1,9 +1,33 @@
+"""
+----------------------------------------------------------------
+----   Project Toolbox: useful and reusable functions       ----
+---------------------------------------------------------------- 
+Developed by Jacopo Mocellin, Riccardo Improta 
+University of Trento - June 2021.
+
+---- Description----
+This script contains functions that need to be called by multiple other files.
+
+Functions currently included:
+    * sanitizecoinput: Checks if the input list contains only coins that are listed in the CoinGecko API. 
+
+"""
+
+
+
+
+
+
+
+
+
 import requests
 
 def sanitizecoininput(analyzedcryptos):
     """
     Checks if the input list contains only coins that are listed in the CoinGecko API.
     If a symbol (es: btc) is used, this function converts the list to the actual id.
+    If the coin is present multiple times in the input list, this function will remove the redundancy 
     Arguments:
         :analyzedcryptos: list of strings
     """

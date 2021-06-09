@@ -1,3 +1,25 @@
+"""
+----------------------------------------------------------------
+----- CoinGecko API price history Scraper and MQTT Publisher ---
+---------------------------------------------------------------- 
+Developed by Jacopo Mocellin, Riccardo Improta 
+University of Trento - June 2021.
+
+---- Description----
+This scripts scrapes the data of the CoinGecko API and publishes that data to the correct
+MQTT topic. The data includes the price history of each selected crypto.
+
+Core features:
+    * Scrapes the price history for any number of cryptos and any number of days
+    * Publishes the crypto data into a customized MQTT topic called scraper/<name of the crypto>
+    * Messages are sent in QOS 1
+
+
+"""
+
+
+
+
 import requests
 import paho.mqtt.client as mqtt
 from datetime import datetime
@@ -90,9 +112,9 @@ class PriceScraper:
 
 if __name__ == "__main__":
     print(datetime.now())
-    #mainscraper=PriceScraper(['bitcoin','XRP','Tether','dogecoin','eth','LTC','ADA','DOT','BCH','BNB','XLM','Chainlink'],analyzeddays=200)
+    mainscraper=PriceScraper(['bitcoin','XRP','Tether','dogecoin','eth','LTC','ADA','DOT','BCH','BNB','XLM','Chainlink'],analyzeddays=210)
     #mainscraper=PriceScraper(['bitcoin','eth','chainlink','XLM','dogecoin','LTC'],analyzeddays=200)
-    mainscraper=PriceScraper('bitcoin')
+    #mainscraper=PriceScraper('bitcoin')
     mainscraper.scrapepricedata()
 
 # the mqtt topic where things are being published is scraper/nomecrypto.

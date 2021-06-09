@@ -1,3 +1,31 @@
+"""
+----------------------------------------------------------------
+----   Data Ingestion: MQTT Subscriber and SQL inserter     ----
+---------------------------------------------------------------- 
+Developed by Jacopo Mocellin, Riccardo Improta 
+University of Trento - June 2021.
+
+---- Description----
+This scripts takes care of the actual ingestion of data and inserts the data into the SQL table "priceshistory".
+For more details about the actual SQL queries, consult the class PricesSQL of database.py 
+
+Core features:
+    * Subscribes to the specific topic of each crypto
+    * Loads data into the SQL efficiently
+
+Other functionalities:
+    * Can read the MQTT messages without inserting data into the SQL. Can be useful if you are planning to use
+      the API data for other purposes.
+    * Filters input data: data that is not properly formatted or that is already present in the pricehistory table
+      will not be considered.
+    * The MQTT subscriber is working in QOS 1
+    * The MQTT subscriber is able to read different topics, this is because a customized topic is made
+    by the publisher for each crypto.
+
+"""
+
+
+
 import pyodbc
 import paho.mqtt.client as mqtt
 import time
@@ -100,6 +128,7 @@ class MqttSQL:
 
 
         # With the time argument, you can decide how much will the subber work for.
+        # Useful if you are expecting lots of data or not much of it.
         client.loop_start()
         time.sleep(timescraping)
         client.loop_stop()
@@ -148,8 +177,8 @@ class MqttSQL:
 if __name__ == "__main__":
 
     mqttsubber=MqttSQL()
-    #mqttsubber.listenscrapers(timescraping=60,verbose=True,save=True)
-    #mqttsubber.sqlinserter()
-    #mqttsubber.db.update_time_window()
+    mqttsubber.listenscrapers(timescraping=300,verbose=True,save=True)
+    mqttsubber.sqlinserter()
+    mqttsubber.db.update_time_window()
     
 
