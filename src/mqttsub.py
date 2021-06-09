@@ -19,6 +19,21 @@ class MqttSQL:
 
     def __init__(self):
 
+<<<<<<< HEAD
+=======
+        #Our Server information
+        self.server = os.environ.get("SQL_SERVER")  #collation: SQL_Latin1_General_CP1_CI_AS
+        self.database = os.environ.get("SQL_DATABASE")
+        self.username = os.environ.get("SQL_USERNAME")
+        self.password = os.environ.get("SQL_PASSWORD")
+        self.driver= os.environ.get("SQL_DRIVER")
+        
+        #SQL connector
+        self.cnxn = pyodbc.connect('DRIVER='+self.driver+';SERVER='+self.server+';PORT=1433;DATABASE='+self.database+';UID='+self.username+';PWD='+ self.password)
+        self.cnxn.setencoding('utf-8')
+        self.cursor=self.cnxn.cursor()
+
+>>>>>>> 048bb48073c128c63ce40712c4d8991700a7dbd4
         #MQTT address
         self.broker = os.environ.get("BROKER_ADDRESS")
         
@@ -35,7 +50,7 @@ class MqttSQL:
         self.myqueue=SimpleQueue()
 
 
-    def listenscrapers(self,save=True,forever=True,verbose=False):
+    def listenscrapers(self,save=True,timescraping=600,verbose=False):
         """
         Select "save" if you want the data to be saved on the SQL database, otherwise this code
         will only print the messages it receives.
@@ -98,14 +113,12 @@ class MqttSQL:
         #client.on_message = on_message
         client.on_connect = on_connect
 
-        #Checks if the Forever argument is true or false
-        if forever==False:
-            client.loop_start()
-            time.sleep(600)
-            client.loop_stop()
-        else:
-            client.loop_start()
-            client.loop_forever()
+
+        # With the time argument, you can decide how much will the subber work for.
+        client.loop_start()
+        time.sleep(timescraping)
+        client.loop_stop()
+
 
 
     def sqlinserter(self):
@@ -114,16 +127,21 @@ class MqttSQL:
         It requires no argument, given that the queue is already present in our class.
         """
 
+        print('Starting the data insertion from the queue')
+
         #We're using a list to make appends because append in python has complexity O(1)
         index=0
         valuelst=[]
         while self.myqueue.empty()==False:
             tempvalue=self.myqueue.get()
-
+            print(tempvalue)
             #IF the value is already inserted in the SQL, don't add it again, otherwise, add it.
             
             if self.db.value_already_present(tempvalue[1],tempvalue[0]):
                 continue       
+            #IF the value is already present in valuelst, don't add it to the query.
+            if str(tempvalue) in valuelst:
+                continue
             
             # We noticed our SQL INSERT query has some problems after 1000 values, as such we're splitting
             # the task and doing multiple inserts of 950 values.
@@ -145,7 +163,7 @@ class MqttSQL:
 if __name__ == "__main__":
 
     mqttsubber=MqttSQL()
-    mqttsubber.listenscrapers(forever=False,verbose=True,save=True)
+    mqttsubber.listenscrapers(timescraping=60,verbose=True,save=True)
     mqttsubber.sqlinserter()
     mqttsubber.db.update_time_window()
     
