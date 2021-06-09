@@ -24,7 +24,7 @@ class MqttSQL:
         self.username = os.environ.get("SQL_USERNAME")
         self.password = os.environ.get("SQL_PASSWORD")
         self.driver= os.environ.get("SQL_DRIVER")
-
+        
         #SQL connector
         self.cnxn = pyodbc.connect('DRIVER='+self.driver+';SERVER='+self.server+';PORT=1433;DATABASE='+self.database+';UID='+self.username+';PWD='+ self.password)
         self.cnxn.setencoding('utf-8')
@@ -44,7 +44,7 @@ class MqttSQL:
         self.myqueue=SimpleQueue()
 
 
-    def listenscrapers(self,save=True,forever=True,verbose=False):
+    def listenscrapers(self,save=True,timescraping=600,verbose=False):
         """
         Select "save" if you want the data to be saved on the SQL database, otherwise this code
         will only print the messages it receives.
@@ -107,14 +107,12 @@ class MqttSQL:
         #client.on_message = on_message
         client.on_connect = on_connect
 
-        #Checks if the Forever argument is true or false
-        if forever==False:
-            client.loop_start()
-            time.sleep(300)
-            client.loop_stop()
-        else:
-            client.loop_start()
-            client.loop_forever()
+
+        # With the time argument, you can decide how much will the subber work for.
+        client.loop_start()
+        time.sleep(timescraping)
+        client.loop_stop()
+
 
 
     def sqlexecute(self,query,commit=False):
@@ -209,7 +207,7 @@ AND coin LIKE '{coin}'
 if __name__ == "__main__":
 
     mqttsubber=MqttSQL()
-    mqttsubber.listenscrapers(forever=False,verbose=True,save=True)
+    mqttsubber.listenscrapers(timescraping=60,verbose=True,save=True)
     mqttsubber.sqlinserter()
     mqttsubber.sqlupdater()
     
