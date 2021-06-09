@@ -19,18 +19,6 @@ class MqttSQL:
 
     def __init__(self):
 
-        #Our Server information
-        self.server = os.environ.get("SQL_SERVER")  #collation: SQL_Latin1_General_CP1_CI_AS
-        self.database = os.environ.get("SQL_DATABASE")
-        self.username = os.environ.get("SQL_USERNAME")
-        self.password = os.environ.get("SQL_PASSWORD")
-        self.driver= os.environ.get("SQL_DRIVER")
-        
-        #SQL connector
-        self.cnxn = pyodbc.connect('DRIVER='+self.driver+';SERVER='+self.server+';PORT=1433;DATABASE='+self.database+';UID='+self.username+';PWD='+ self.password)
-        self.cnxn.setencoding('utf-8')
-        self.cursor=self.cnxn.cursor()
-
         #MQTT address
         self.broker = os.environ.get("BROKER_ADDRESS")
         
@@ -160,8 +148,8 @@ class MqttSQL:
 if __name__ == "__main__":
 
     mqttsubber=MqttSQL()
-    mqttsubber.listenscrapers(timescraping=60,verbose=True,save=True)
-    mqttsubber.sqlinserter()
-    mqttsubber.db.update_time_window()
+    #mqttsubber.listenscrapers(timescraping=60,verbose=True,save=True)
+    #mqttsubber.sqlinserter()
+    #mqttsubber.db.update_time_window()
     
 
