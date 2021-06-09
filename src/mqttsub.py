@@ -3,6 +3,7 @@ import paho.mqtt.client as mqtt
 import time
 import datetime
 from queue import SimpleQueue
+from database import PricesSQL
 from dotenv import load_dotenv
 import os
 
@@ -18,21 +19,11 @@ class MqttSQL:
 
     def __init__(self):
 
-        #Our Server information
-        self.server = os.environ.get("SQL_SERVER")  #collation: SQL_Latin1_General_CP1_CI_AS
-        self.database = os.environ.get("SQL_DATABASE")
-        self.username = os.environ.get("SQL_USERNAME")
-        self.password = os.environ.get("SQL_PASSWORD")
-        self.driver= os.environ.get("SQL_DRIVER")
-
-        #SQL connector
-        self.cnxn = pyodbc.connect('DRIVER='+self.driver+';SERVER='+self.server+';PORT=1433;DATABASE='+self.database+';UID='+self.username+';PWD='+ self.password)
-        self.cnxn.setencoding('utf-8')
-        self.cursor=self.cnxn.cursor()
-
         #MQTT address
-        self.broker='13.73.184.147'
+        self.broker = os.environ.get("BROKER_ADDRESS")
         
+        #Instantiate connection to database
+        self.db = PricesSQL()
 
         #Only used by listenscrapers if verbose is on. Useful for debugging, because it checks
         #how many (and which) message the sub has received
@@ -117,20 +108,6 @@ class MqttSQL:
             client.loop_forever()
 
 
-    def sqlexecute(self,query,commit=False):
-        """
-        A very simple function to work with SQL
-        it allows to do simple queries and commit them without having to write the whole thing.
-        Also returns self.cursor to make sure that you can use it for fetchall() functions whenever
-        you do a SELECT query.
-        """
-
-        self.cursor.execute(query)
-        if commit:
-            self.cursor.commit()
-
-        return self.cursor
-
     def sqlinserter(self):
         """
         This is the part of the code that takes messages from the queue and pushes them to the SQL.
@@ -144,7 +121,8 @@ class MqttSQL:
             tempvalue=self.myqueue.get()
 
             #IF the value is already inserted in the SQL, don't add it again, otherwise, add it.
-            if len(self.sqlexecute(f"SELECT * FROM dbo.pricedata WHERE timevalue={tempvalue[1]} AND coin LIKE '{tempvalue[0]}';").fetchall())!=0:
+            
+            if self.db.value_already_present(tempvalue[1],tempvalue[0]):
                 continue       
             
             # We noticed our SQL INSERT query has some problems after 1000 values, as such we're splitting
@@ -154,41 +132,14 @@ class MqttSQL:
                 valuelst.append(str(tempvalue))
             else:
                 index=0
-                finalquery='INSERT INTO dbo.pricedata VALUES '+(','.join(valuelst))+';'
-                self.sqlexecute(finalquery,commit=True)
+                self.db.insert_price_values(valuelst)
                 valuelst=[]
 
         # Given that our queue rarely has multiple of 980 elements, we'll do a final push by 
         # selecting the remaining messages.
         if len(valuelst)>0:
-            finalquery='INSERT INTO dbo.pricedata VALUES '+(','.join(valuelst))+';'
-            self.sqlexecute(finalquery,commit=True)
+            self.db.insert_price_values(valuelst)
             valuelst=[]
-
-
-    def sqlupdater(self):
-        """
-        Basically: if the database has more than 200 non-deleted
-        rows for each given coin, delete the oldest record by marking its deleted column as deleted.
-        """  
-
-        #We select all coins in the database
-        cryptosquery=self.sqlexecute("SELECT DISTINCT coin FROM dbo.pricedata")
-        cryptos=[i[0] for i in cryptosquery.fetchall()]
-
-        #Actual updater, it's mostly SQL.
-        for coin in cryptos:
-            updated=False
-            while not updated:
-                if len(self.sqlexecute("SELECT * FROM dbo.pricedata WHERE coin LIKE '{}' AND deleted=0;".format(coin)).fetchall())>200:
-                    self.sqlexecute("""
-                    UPDATE dbo.pricedata SET deleted=1 WHERE id=(
-                    SELECT id FROM dbo.pricedata WHERE 
-                    timevalue=(SELECT MIN(timevalue) FROM dbo.pricedata WHERE coin LIKE '{}' AND deleted=0)
-                    AND coin LIKE '{}'
-                    );""".format(coin,coin),True)
-                else:
-                    updated=True
 
     
 if __name__ == "__main__":
@@ -196,6 +147,6 @@ if __name__ == "__main__":
     mqttsubber=MqttSQL()
     mqttsubber.listenscrapers(forever=False,verbose=True,save=True)
     mqttsubber.sqlinserter()
-    mqttsubber.sqlupdater()
+    mqttsubber.db.update_time_window()
     
 

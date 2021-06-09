@@ -3,7 +3,7 @@
 ---- Telegram Bot Serving Layer for Cryptocurrency Predictor----
 ---------------------------------------------------------------- 
 Developed by Jacopo Mocellin, Riccardo Improta 
-University of Trento - May 2021.
+University of Trento - June 2021.
 
 ---- Description----
 Script taking care of the interaction with the end user for the Cryptocurrency Predictor.
@@ -16,7 +16,7 @@ Functionalities include:
 from datetime import datetime
 from telegram.ext import * 
 import re
-from Requester import UtentiSQL
+from database import UsersSQL
 from projecttoolbox import sanitizecoininput
 from dotenv import load_dotenv
 import os
@@ -27,7 +27,7 @@ KEY = os.environ.get("KEY")
 #solution 2 is to simpy create a file where they are written clear-text. store your passwords unencrypted on disk, protected only by filesystem permissions. If this is not an acceptable security tradeoff,
 #solution 3 is using keyring
 
-db = UtentiSQL()
+db = UsersSQL()
 
 def setting_routine(input_text):
     errorcoin = None
@@ -63,7 +63,7 @@ def setting_routine(input_text):
             user_preferences = extract_coinpct(preference,user_preferences)
         except:
             if errorcoin != None:
-                return (f'The coin "{errorcoin}" is not currently supported.\nPlease refer to https://api.coingecko.com/api/v3/coins/list for a complete list of supported coins.', {})
+                return (f'The coin "{errorcoin}" is currently not supported.\nPlease refer to https://api.coingecko.com/api/v3/coins/list for a complete list of supported coins.', {})
             else:
                 return (f'Please, type your preferences with the correct syntax.', {})
     return ('Preferences correctly imported!', user_preferences)

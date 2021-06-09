@@ -47,7 +47,6 @@ class PriceScraper:
 
 
         #mqtt connecter
-        #ip:13.73.184.147
         self.broker=projectbroker
         self.client=None
         self.connected=False
