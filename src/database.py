@@ -299,7 +299,7 @@ class PricesSQL():
         dictret={}
 
         for i in latestprices:
-            dictret[i[0]]=i[1]
+            dictret[i[0]]=round(i[1],6)
 
         if save:
             out_file = open("latestprices.json", "w")

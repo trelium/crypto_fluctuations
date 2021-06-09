@@ -6,6 +6,7 @@ TO DO.
 import requests
 from database import UsersSQL,PricesSQL
 import json
+from pprint import pprint
 
 class Notifier:
 
@@ -23,3 +24,19 @@ class Notifier:
                 self.latestprice=json.load(f)           
 
 
+        self.currentprices={}
+        for crypto in self.latestprice:
+            response= requests.get(f'https://api.coingecko.com/api/v3/simple/price?ids={crypto}&vs_currencies=usd')
+            response=response.json()
+            response=dict(response)
+            self.currentprices[crypto]=round(response[crypto]['usd'],6)
+
+        self.percentagechange={}
+        for crypto in self.currentprices:
+            # https://www.calculatorsoup.com/calculators/algebra/percent-change-calculator.php
+            self.percentagechange[crypto]=round(((self.currentprices[crypto] - self.latestprice[crypto])/self.latestprice[crypto])*100,6)
+            
+            
+
+test=Notifier()
+pprint(test.percentagechange)
