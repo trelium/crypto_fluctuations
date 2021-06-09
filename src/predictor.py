@@ -16,14 +16,25 @@ Functionalities include:
 
 """
 from sklearn.linear_model import LinearRegression
-from dotenv import load_dotenv
-import os
+from database import PricesSQL
+#from dotenv import load_dotenv
+#import os
 
-load_dotenv()
+#load_dotenv()
 
+#Instatiate database interface 
+db = PricesSQL()
 
-#For each coin 
-#take last 200 values
-#fit linear model 
-#if value for today is higher than yesterday, put bullish in sql
+#Get list of all coins currently present in db
+cryptos = db.get_coins()
+print(cryptos)
+
+for currency in cryptos:
+    prices = db.get_prices(currency)
+    print(prices)
+    break
+    #fit linear model 
+    #reg = LinearRegression().fit(X, y)
+
+    #if value for today is higher than yesterday, put bullish in sql
 

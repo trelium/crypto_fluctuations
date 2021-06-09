@@ -21,12 +21,11 @@ from projecttoolbox import sanitizecoininput
 from dotenv import load_dotenv
 import os
 
+#Get credentials to manage Telegram bot 
 load_dotenv()
 KEY = os.environ.get("KEY")
-#keys need to be stored out of code: solution 1 is to encrypt the strings and save the encrypted version in a file. The python script needs to have a key for decoding. 
-#solution 2 is to simpy create a file where they are written clear-text. store your passwords unencrypted on disk, protected only by filesystem permissions. If this is not an acceptable security tradeoff,
-#solution 3 is using keyring
 
+#Instantiate database interface 
 db = UsersSQL()
 
 def setting_routine(input_text):

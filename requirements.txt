@@ -2,5 +2,5 @@ pycoingecko
 pyodbc
 python-dotenv
 python-telegram-bot
-scikit-learn
 paho-mqtt
+scikit-learn
