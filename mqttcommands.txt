@@ -19,16 +19,13 @@ start: mosquitto -v
 ------
 SQL pricedata create query :
 
-CREATE TABLE pricedata(
+CREATE TABLE pricehistory(
 id int IDENTITY(1,1) PRIMARY KEY,
 coin VARCHAR(255) NOT NULL,
 timevalue BIGINT NOT NULL,   
 price FLOAT NOT NULL,
 deleted BIT NOT NULL
-);
-
-if you want the constraint:
-CONSTRAINT controllaunico UNIQUE (coin,timevalue,price)
+CONSTRAINT controllaunico UNIQUE (coin,timevalue,price);
 
 
 #ubuntu wsl commands:
