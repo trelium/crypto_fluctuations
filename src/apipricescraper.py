@@ -86,8 +86,9 @@ class pricescraper:
 
 if __name__ == "__main__":
     print(datetime.now())
-    mainscraper=pricescraper(['bitcoin','XRP','Tether','dogecoin','eth','LTC','ADA','DOT','BCH','BNB','XLM','Chainlink'],analyzeddays=220)
-    #mainscraper=pricescraper(['bitcoin','eth','chainlink','XLM','dogecoin','LTC'],analyzeddays=200)
+    mainscraper=pricescraper(['bitcoin','XRP','Tether','eth','LTC','dogecoin','ADA','DOT','BCH','BNB','XLM','Chainlink'],analyzeddays=300)
+    #mainscraper=pricescraper(['dogecoin','bitcoin','eth','chainlink','XLM','LTC'],analyzeddays=210)
+    #mainscraper=pricescraper(['dogecoin'],analyzeddays=205)
     mainscraper.scrapepricedata()
 
 # the mqtt topic where things are being published is scraper/nomecrypto.

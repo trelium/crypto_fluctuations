@@ -106,7 +106,7 @@ class mqtttosql:
         #Checks if the Forever argument is true or false
         if forever==False:
             client.loop_start()
-            time.sleep(600)
+            time.sleep(300)
             client.loop_stop()
         else:
             client.loop_start()
@@ -133,15 +133,20 @@ class mqtttosql:
         It requires no argument, given that the queue is already present in our class.
         """
 
+        print('Starting the data insertion from the queue')
+
         #We're using a list to make appends because append in python has complexity O(1)
         index=0
         valuelst=[]
         while self.myqueue.empty()==False:
             tempvalue=self.myqueue.get()
-
+            print(tempvalue)
             #IF the value is already inserted in the SQL, don't add it again, otherwise, add it.
             if len(self.sqlexecute(f"SELECT * FROM dbo.pricedata WHERE timevalue={tempvalue[1]} AND coin LIKE '{tempvalue[0]}';").fetchall())!=0:
                 continue       
+            #IF the value is already present in valuelst, don't add it to the query.
+            if str(tempvalue) in valuelst:
+                continue
             
             # We noticed our SQL INSERT query has some problems after 1000 values, as such we're splitting
             # the task and doing multiple inserts of 950 values.
@@ -168,23 +173,33 @@ class mqtttosql:
         rows for each given coin, delete the oldest record by marking its deleted column as deleted.
         """  
 
+        print('Starting to Update the SQL File')
         #We select all coins in the database
         cryptosquery=self.sqlexecute("SELECT DISTINCT coin FROM dbo.pricedata")
         cryptos=[i[0] for i in cryptosquery.fetchall()]
 
         #Actual updater, it's mostly SQL.
         for coin in cryptos:
+            print(coin)
             updated=False
             while not updated:
                 if len(self.sqlexecute("SELECT * FROM dbo.pricedata WHERE coin LIKE '{}' AND deleted=0;".format(coin)).fetchall())>200:
-                    self.sqlexecute("""
+                    self.sqlexecute(f"""
                     UPDATE dbo.pricedata SET deleted=1 WHERE id=(
-                    SELECT id FROM dbo.pricedata WHERE 
-                    timevalue=(SELECT MIN(timevalue) FROM dbo.pricedata WHERE coin LIKE '{}' AND deleted=0)
-                    AND coin LIKE '{}'
-                    );""".format(coin,coin),True)
+SELECT id
+FROM dbo.pricedata 
+WHERE timevalue=(
+    SELECT MIN(timevalue)
+    FROM dbo.pricedata
+    WHERE coin
+    LIKE '{coin}' AND deleted=0
+)
+AND coin LIKE '{coin}'
+);
+""",True)
                 else:
                     updated=True
+
 
     
 if __name__ == "__main__":

@@ -45,5 +45,5 @@ def sanitizecoininput(analyzedcryptos):
 #If you want to test the sanitizer:
 #print(sanitizecoininput(['bitCoin','eTh','LTc']))
 #print(sanitizecoininput('parola')) <= Will raise an error
-print(sanitizecoininput(['bitcoin','bitcoin']))
+#print(sanitizecoininput(['bitcoin','bitcoin']))
 
