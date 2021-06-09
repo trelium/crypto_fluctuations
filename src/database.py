@@ -20,6 +20,7 @@ import pyodbc
 from pycoingecko import CoinGeckoAPI
 from dotenv import load_dotenv
 import os
+import json
 
 load_dotenv()
 
@@ -286,3 +287,22 @@ class PricesSQL():
         """
         prices = self.execute_query(f"SELECT * FROM dbo.priceshistory WHERE coin LIKE '{coin}' AND deleted=0;").fetchall()
         return prices
+
+    def get_latest_prices(self,save=True):
+        """
+        Update the "latestprices.json" with the latest prices of the coins.
+        It does so by selecting the most recent timestamp from dbo.priceshistory and the coin prices for that date.
+        By default, it saves the data into a json.
+        """
+
+        latestprices=self.execute_query("SELECT coin,price FROM dbo.priceshistory WHERE timevalue=(SELECT MAX(timevalue) FROM dbo.priceshistory)").fetchall()
+        dictret={}
+
+        for i in latestprices:
+            dictret[i[0]]=i[1]
+
+        if save:
+            out_file = open("latestprices.json", "w")
+            json.dump(dictret, out_file, indent = 0)
+
+        return dictret

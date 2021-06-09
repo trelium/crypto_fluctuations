@@ -173,6 +173,11 @@ class MqttSQL:
             self.db.insert_price_values(valuelst)
             valuelst=[]
 
+    def update_latest_prices(self):
+        self.db.get_latest_prices()
+
+
+
     
 if __name__ == "__main__":
 
@@ -180,5 +185,6 @@ if __name__ == "__main__":
     mqttsubber.listenscrapers(timescraping=300,verbose=True,save=True)
     mqttsubber.sqlinserter()
     mqttsubber.db.update_time_window()
+    mqttsubber.update_latest_prices()
     
 
