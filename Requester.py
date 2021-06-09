@@ -19,7 +19,10 @@ Functionalities include:
 # ! pip install pycoingecko
 import pyodbc
 from pycoingecko import CoinGeckoAPI
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
 class UtentiSQL():
     """
@@ -27,11 +30,11 @@ class UtentiSQL():
     by the users via the Telegram interface. 
     """
     def __init__(self):
-        self.server = 'bdtproject.database.windows.net'  #collation: SQL_Latin1_General_CP1_CI_AS
-        self.database = 'BDT-sql2'
-        self.username = 'jacoccardo'
-        self.password = 'Riccarcopo1'   
-        self.driver= '{ODBC Driver 17 for SQL Server}'
+        self.server = os.environ.get("SQL_SERVER")  #collation: SQL_Latin1_General_CP1_CI_AS
+        self.database = os.environ.get("SQL_DATABASE")
+        self.username = os.environ.get("SQL_USERNAME")
+        self.password = os.environ.get("SQL_PASSWORD")
+        self.driver= os.environ.get("SQL_DRIVER")
         
         #establish connection 
         self.cnxn = pyodbc.connect('DRIVER='+self.driver+';SERVER='+self.server+';PORT=1433;DATABASE='+self.database+';UID='+self.username+';PWD='+ self.password)

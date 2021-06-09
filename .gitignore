@@ -1,0 +1,6 @@
+#Credentials files for bot and SQL server
+.env
+
+# IDEs and editors configuration
+.vscode/
+__pycache__/

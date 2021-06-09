@@ -3,9 +3,13 @@ import paho.mqtt.client as mqtt
 import time
 import datetime
 from queue import SimpleQueue
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 
-class mqtttosql:
+class MqttSQL:
     """
     This object fulfills the "sub" related role in our scraper.
     It listens to the mqtt publisher of the apipricescraper and it can load the data it receives in the
@@ -15,11 +19,11 @@ class mqtttosql:
     def __init__(self):
 
         #Our Server information
-        self.server = 'bdtproject.database.windows.net'
-        self.database = 'BDT-sql2'
-        self.username = 'jacoccardo'
-        self.password = 'Riccarcopo1'
-        self.driver= '{ODBC Driver 17 for SQL Server}'
+        self.server = os.environ.get("SQL_SERVER")  #collation: SQL_Latin1_General_CP1_CI_AS
+        self.database = os.environ.get("SQL_DATABASE")
+        self.username = os.environ.get("SQL_USERNAME")
+        self.password = os.environ.get("SQL_PASSWORD")
+        self.driver= os.environ.get("SQL_DRIVER")
 
         #SQL connector
         self.cnxn = pyodbc.connect('DRIVER='+self.driver+';SERVER='+self.server+';PORT=1433;DATABASE='+self.database+';UID='+self.username+';PWD='+ self.password)
@@ -204,7 +208,7 @@ AND coin LIKE '{coin}'
     
 if __name__ == "__main__":
 
-    mqttsubber=mqtttosql()
+    mqttsubber=MqttSQL()
     mqttsubber.listenscrapers(forever=False,verbose=True,save=True)
     mqttsubber.sqlinserter()
     mqttsubber.sqlupdater()

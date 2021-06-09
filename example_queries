@@ -1,0 +1,37 @@
+ --SELECT* from  dbo.utenti_bot 
+
+/*
+update utenti_bot set chat_id='chatdiprova' where state='ready'
+IF @@ROWCOUNT=0
+   insert into utenti_bot(chat_id) values('chatdiprova2');
+
+*/
+
+-- SELECT state FROM dbo.utenti_bot WHERE chat_id = 444610376
+
+--DROP TABLE utenti_bot;
+/*
+CREATE TABLE utenti_bot 
+            (user_id VARCHAR(300), 
+            chat_id VARCHAR(300), 
+            state VARCHAR(300), 
+            active BINARY(1), 
+            coin_1 VARCHAR(300),
+            pct_1 FLOAT, 
+            coin_2 VARCHAR(300),
+            pct_2 FLOAT,
+            coin_3 VARCHAR(300),
+            pct_3 FLOAT,
+            coin_4 VARCHAR(300),
+            pct_4 FLOAT,
+            coin_5 VARCHAR(300),
+            pct_5 FLOAT);
+
+
+INSERT INTO dbo.utenti_bot(chat_id,state) VALUES ('fhrigni56','settings')
+
+UPDATE dbo.utenti_bot SET coin_1 = 'bitcoin', pct_1 = -12 WHERE chat_id = 'fhrigni56'
+
+*/
+SELECT* from  dbo.utenti_bot 
+

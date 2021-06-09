@@ -2,11 +2,16 @@ import requests
 import paho.mqtt.client as mqtt
 from datetime import datetime
 from projecttoolbox import *
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 
 
-class pricescraper:
-    """ Scrapes the price from the CoinGecko API and sends them to the scraper/"Name of the coin" topic in our 
+class PriceScraper:
+    """ 
+    Scrapes the price from the CoinGecko API and sends them to the scraper/"Name of the coin" topic in our 
     MQTT server.
     """
 
@@ -86,9 +91,8 @@ class pricescraper:
 
 if __name__ == "__main__":
     print(datetime.now())
-    mainscraper=pricescraper(['bitcoin','XRP','Tether','eth','LTC','dogecoin','ADA','DOT','BCH','BNB','XLM','Chainlink'],analyzeddays=300)
-    #mainscraper=pricescraper(['dogecoin','bitcoin','eth','chainlink','XLM','LTC'],analyzeddays=210)
-    #mainscraper=pricescraper(['dogecoin'],analyzeddays=205)
+    mainscraper=PriceScraper(['bitcoin','XRP','Tether','dogecoin','eth','LTC','ADA','DOT','BCH','BNB','XLM','Chainlink'],analyzeddays=200)
+    #mainscraper=pricescraper(['bitcoin','eth','chainlink','XLM','dogecoin','LTC'],analyzeddays=200)
     mainscraper.scrapepricedata()
 
 # the mqtt topic where things are being published is scraper/nomecrypto.

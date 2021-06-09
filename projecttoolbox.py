@@ -4,6 +4,8 @@ def sanitizecoininput(analyzedcryptos):
     """
     Checks if the input list contains only coins that are listed in the CoinGecko API.
     If a symbol (es: btc) is used, this function converts the list to the actual id.
+    Arguments:
+        :analyzedcryptos: list of strings
     """
 
     #Checks if the input is a list, otherwise, put it in a list
@@ -33,8 +35,6 @@ def sanitizecoininput(analyzedcryptos):
                 ret.append(crypto)
         elif crypto in tempsymbol:
             ret.append(tempsymbol[crypto])
-        
-        
         else:
             raise ValueError(f"\nThe '{crypto}' cryptocurrency is not listed in the coin list of CoinGecko.\nPlease refer to https://api.coingecko.com/api/v3/coins/list for a complete list of supported coins.")
 

@@ -55,3 +55,23 @@ diction  = {'update_id': 136492356, 'message': {'message_id': 272, 'date': 16215
 
 print(diction['message']['from']['username'])
 print (u'\U0001f604')
+
+
+"""
+cg = CoinGeckoAPI()
+db = UtentiSQL()
+
+rows = db.cursor.fetchall()
+print(rows)
+
+                                 
+currentvalues = cg.get_price(ids=['bitcoin', 'ripple', 'ethereum','Binance Coin','dogecoin' ], vs_currencies='usd')
+print(currentvalues)
+print(db.get_chats(currentvalues))
+print(db.set_state(chat='chatdiprova', user='utenteprova', state= 'ready'))
+db.cursor.execute(" SELECT* from  dbo.utenti_bot ")
+rows = db.cursor.fetchall()
+print(rows)
+#db.cnxn.commit()
+
+"""
