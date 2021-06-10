@@ -302,7 +302,7 @@ class PricesSQL():
             dictret[i[0]]=round(i[1],6)
 
         if save:
-            with open(os.join("data","latestprices.json"), "w") as out_file:
+            with open(os.path.join("data","latestprices.json"), "w") as out_file:
                 json.dump(dictret, out_file, indent = 0)
 
         return dictret
