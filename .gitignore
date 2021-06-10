@@ -4,3 +4,4 @@
 # IDEs and editors configuration
 .vscode/
 __pycache__/
+src/__pycache__/

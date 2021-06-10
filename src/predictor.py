@@ -27,12 +27,10 @@ db = PricesSQL()
 
 #Get list of all coins currently present in db
 cryptos = db.get_coins()
-print(cryptos)
 
-for currency in cryptos:
-    prices = db.get_prices(currency)
-    print(prices)
-    break
+for coin in cryptos:
+    prices = db.get_prices(coin)
+
     #fit linear model 
     #reg = LinearRegression().fit(X, y)
 
