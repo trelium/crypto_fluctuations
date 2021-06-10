@@ -279,13 +279,13 @@ class PricesSQL():
                 else:
                     updated=True
  
-    def get_prices(self, coin):
+    def get_prices(self, coin:str()):
         """
         Returns a list containing the closing prices marked as not deleted for a specified coin name
         Arguments:
             :coin: name of the coin. Must be a sanitized (as returned by projecttoolbox.sanitizecoininput()) 
         """
-        prices = self.execute_query(f"SELECT * FROM dbo.priceshistory WHERE coin LIKE '{coin}' AND deleted=0;").fetchall()
+        prices = self.execute_query(f"SELECT price FROM dbo.priceshistory WHERE coin LIKE '{coin}' AND deleted=0;").fetchall()
         return prices
 
     def get_latest_prices(self,save=True):
@@ -302,7 +302,7 @@ class PricesSQL():
             dictret[i[0]]=round(i[1],6)
 
         if save:
-            out_file = open("latestprices.json", "w")
-            json.dump(dictret, out_file, indent = 0)
+            with open(os.join("data","latestprices.json"), "w") as out_file:
+                json.dump(dictret, out_file, indent = 0)
 
         return dictret

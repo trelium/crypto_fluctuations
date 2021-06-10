@@ -7,20 +7,20 @@ import requests
 from database import UsersSQL,PricesSQL
 import json
 from pprint import pprint
+import os 
 
 class Notifier:
-
 
     def __init__(self):
         self.pricesql=PricesSQL()
 
 
         try:
-            with open("latestprices.json") as f:
+            with open(os.path.join("data","latestprices.json")) as f: #TODO: Riccardo please test this on your pc 
                 self.latestprice=json.load(f)
         except:
             self.pricesql.get_latest_prices()
-            with open("latestprices.json") as f:
+            with open(os.path.join("data","latestprices.json")) as f:
                 self.latestprice=json.load(f)           
 
 
