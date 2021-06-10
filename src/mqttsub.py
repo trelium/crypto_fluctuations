@@ -174,6 +174,7 @@ class MqttSQL:
             valuelst=[]
 
     def update_latest_prices(self):
+        #Updates the json file to include the latest prices from the SQL table
         self.db.get_latest_prices()
 
 

@@ -35,6 +35,11 @@ class Notifier:
         for crypto in self.currentprices:
             # https://www.calculatorsoup.com/calculators/algebra/percent-change-calculator.php
             self.percentagechange[crypto]=round(((self.currentprices[crypto] - self.latestprice[crypto])/self.latestprice[crypto])*100,6)
+
+
+    def update_latest_prices(self):
+        #Updates the json file to include the latest prices from the SQL table
+        self.pricesql.get_latest_prices()
             
             
 
