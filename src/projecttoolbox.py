@@ -1,25 +1,17 @@
 """
-----------------------------------------------------------------
-----   Project Toolbox: useful and reusable functions       ----
----------------------------------------------------------------- 
+--------------------------------------------------------
+---- Project Toolbox: useful and reusable functions ----
+-------------------------------------------------------- 
 Developed by Jacopo Mocellin, Riccardo Improta 
 University of Trento - June 2021.
 
 ---- Description----
-This script contains functions that need to be called by multiple other files.
+This module contains utility functions that need to be called by multiple other files.
 
 Functions currently included:
     * sanitizecoinput: Checks if the input list contains only coins that are listed in the CoinGecko API. 
 
 """
-
-
-
-
-
-
-
-
 
 import requests
 
@@ -53,7 +45,7 @@ def sanitizecoininput(analyzedcryptos):
     # IF this condition is not satisfied, raise an error.
     ret=[]
     for crypto in cryptos:
-        crypto=crypto.lower()
+        crypto=crypto.lower().replace(' ','-')
         if crypto in tempid:
             if crypto not in ret:
                 ret.append(crypto)

@@ -41,15 +41,14 @@ def setting_routine(input_text):
         
         coinname = substr[0].replace(' ','')
         try:
-            coinname = sanitizecoininput(coinname)[0]
+            coinname = sanitizecoininput(coinname)[0] 
             user_dict[coinname] = foundpct
             return user_dict
         except:
             nonlocal errorcoin
-            errorcoin = coinname
+            errorcoin = substr[0]
             raise ValueError
         
-
     user_preferences = dict()
     user_message = str(input_text).lower()
 
@@ -62,7 +61,7 @@ def setting_routine(input_text):
             user_preferences = extract_coinpct(preference,user_preferences)
         except:
             if errorcoin != None:
-                return (f'The coin "{errorcoin}" is currently unsupported. You may try entering new preferences', {}) #\nPlease refer to https://api.coingecko.com/api/v3/coins/list for a complete list of supported coins.
+                return (f'The coin "{errorcoin}" is currently unsupported. No preferences were set.', {}) 
             else:
                 return (f'Please, type your preferences with the correct syntax.', {})
     return ('Preferences correctly imported!', user_preferences)
@@ -70,7 +69,7 @@ def setting_routine(input_text):
 
 def start_command(update, context):
     user = update.message.from_user
-    if not db.is_already_present(chat = str(update.message.chat.id)) or db.get_state(chat = str(update.message.chat.id)) == 'settings': #TODO second condition does not seem to work 
+    if not db.is_already_present(chat = str(update.message.chat.id)) or db.get_state(chat = str(update.message.chat.id)) == 'settings': 
         settings_command(update, context)
     elif db.get_state(chat = str(update.message.chat.id)) == False:
         update.message.reply_text('Error starting service. Please contact the admin')
@@ -85,7 +84,8 @@ def start_command(update, context):
 def settings_command(update, context): 
     if db.set_state(chat = str(update.message.chat.id), user = str(update.message.chat.username), state = 'settings') != False:
         update.message.reply_text('Please type the percentage of change in price (compared to yesterday\'s closing price in $) above which (or below which, prepend - sign) you want a notification to be pushed')
-        update.message.reply_text('Please use the following format to specify the coins and percentages you\'re interested in: Coinname1 @ percentage1 ; Coinname2 @ percentage2')
+        update.message.reply_text('Please use the following format to specify the coins and percentages you\'re interested in: Coinname1 @ percentage1 ; Coinname2 @ percentage2 ; ...')
+        update.message.reply_text('To get a list of currently supported coins, issue command /supportedcoins')
     else:
         update.message.reply_text('Error updating preferences. Please contact the admin') 
   
@@ -100,16 +100,18 @@ def help_command(update, context):
     #return message of welcome
     update.message.reply_text('Enter command /start to begin.')
 
+def supported_coins(update,context):
+    update.message.reply_text('This is a list of currently supported coins:')
+    update.message.reply_text('\n'.join(db.get_coins_in_table()))
+
 def handle_message(update, context):
     text = str(update.message.text).lower() #receive message
     if db.get_state(chat = str(update.message.chat.id)) == 'settings':
         response, dizionario = setting_routine(text) #process it 
         update.message.reply_text(response) #send response 
-        print(dizionario)
         if len(dizionario) != 0:
             db.set_preferences(chat = str(update.message.chat.id), preferences = dizionario) #TODO change format
             #print(update.message.chat.username) #debug only
-            print('ok')
             db.set_state(chat = str(update.message.chat.id), user = str(update.message.chat.username), state = 'ready')
             update.message.reply_text('You are ready to receive notifications. Issue command /start to activate the service.') 
     else: 
@@ -125,6 +127,7 @@ def main(): #Note: conversationHandler
     dp.add_handler(CommandHandler('start', start_command))
     dp.add_handler(CommandHandler('help', help_command))
     dp.add_handler(CommandHandler('stop', stop_command))
+    dp.add_handler(CommandHandler('supportedcoins', supported_coins))
     dp.add_handler(CommandHandler('settings', settings_command))
     
     dp.add_handler(MessageHandler(Filters.text, handle_message))#only passes updates to the callback if filtered as text
