@@ -51,7 +51,7 @@ class UsersSQL():
         self.cursor.execute("""SELECT  table_name name FROM INFORMATION_SCHEMA.TABLES """)
         present_tables = self.cursor.fetchall()
         if not 'users' in [elem for sublist in present_tables for elem in sublist]: #True if table is present
-            response= requests.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false")
+            response= requests.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false")
             response=response.json()
             supported_coins=[i['id'] for i in response]
             table_query = """CREATE TABLE users 

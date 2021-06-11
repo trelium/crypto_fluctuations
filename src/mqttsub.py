@@ -183,7 +183,7 @@ class MqttSQL:
 if __name__ == "__main__":
 
     mqttsubber=MqttSQL()
-    mqttsubber.listenscrapers(timescraping=300,verbose=True,save=True)
+    mqttsubber.listenscrapers(timescraping=600,verbose=True,save=True)
     mqttsubber.sqlinserter()
     mqttsubber.db.update_time_window()
     mqttsubber.update_latest_prices()
