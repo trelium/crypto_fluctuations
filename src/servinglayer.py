@@ -52,7 +52,7 @@ def setting_routine(input_text):
 
     user_preferences = dict()
     user_message = str(input_text).lower()
-
+    user_message = user_message.rstrip(';') #Useful if the user puts in a final ';'
     if ';' in user_message: 
         user_message = user_message.split(';')
     else:
