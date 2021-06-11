@@ -21,6 +21,7 @@ from pycoingecko import CoinGeckoAPI
 from dotenv import load_dotenv
 import os
 import json
+import requests
 
 load_dotenv()
 
@@ -50,21 +51,18 @@ class UsersSQL():
         self.cursor.execute("""SELECT  table_name name FROM INFORMATION_SCHEMA.TABLES """)
         present_tables = self.cursor.fetchall()
         if not 'users' in [elem for sublist in present_tables for elem in sublist]: #True if table is present
-            self.cursor.execute("""CREATE TABLE users 
-                                    (user_id VARCHAR(300), 
-                                    chat_id VARCHAR(300), 
-                                    state VARCHAR(300), 
-                                    active BINARY(1), 
-                                    coin_1 VARCHAR(300),
-                                    pct_1 FLOAT, 
-                                    coin_2 VARCHAR(300),
-                                    pct_2 FLOAT,
-                                    coin_3 VARCHAR(300),
-                                    pct_3 FLOAT,
-                                    coin_4 VARCHAR(300),
-                                    pct_4 FLOAT,
-                                    coin_5 VARCHAR(300),
-                                    pct_5 FLOAT);""")
+            response= requests.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false")
+            response=response.json()
+            supported_coins=[i['id'] for i in response]
+            table_query = """CREATE TABLE users 
+                        (user_id VARCHAR(300), 
+                        chat_id VARCHAR(300), 
+                        state VARCHAR(300), 
+                        active BINARY(1),"""
+            for coin in supported_coins:
+                table_query += f' "{coin}" FLOAT, \n "latest_update_{coin}" BIGINT,\n'
+            table_query = table_query.rstrip(',') + ');'
+            self.cursor.execute(table_query)
             self.cursor.commit()
 
     
@@ -157,41 +155,17 @@ class UsersSQL():
                     self.cursor.execute("""INSERT INTO dbo.users(chat_id) 
                                     #VALUES '{}' """.format(chat))
                     self.cnxn.commit()                        
-            i=0
-            for coin in preferences: #valid only since we have 5 preferences to loop
-                i+=1
-                self.cursor.execute("""UPDATE dbo.users 
-                                    SET coin_{i} = '{name}', pct_{i} = {pct}                                    
-                                    WHERE chat_id = '{chat}' """.format(i = i, name = coin, pct = preferences[coin], chat=chat))
+            
+            for coin in preferences:
+                self.cursor.execute(f"""UPDATE dbo.users 
+                                    SET {coin} = {preferences[coin]}                                    
+                                    WHERE chat_id = '{chat}' """)
                 self.cnxn.commit()
                 
         except:
             raise ValueError()
 
-    def get_preferences(self):
-        """
-        This function returns a set of all the coins that the users want to be updated about.
-        Each coin is listed only once, without information about price threesolds or users. 
-        """
-        self.cursor.execute("""SELECT coin_1 FROM dbo.users WHERE coin_1 IS NOT NULL
-                                UNION
-                                SELECT coin_2 FROM dbo.users WHERE coin_2 IS NOT NULL
-                                UNION
-                                SELECT coin_3 FROM dbo.users WHERE coin_3 IS NOT NULL
-                                UNION
-                                SELECT coin_4 FROM dbo.users WHERE coin_4 IS NOT NULL
-                                UNION
-                                SELECT coin_5 FROM dbo.users WHERE coin_5 IS NOT NULL""")
-
-        #a set is used for efficiency
-        ret=set()
-        
-        #adds each preferred crypto to the set
-        for i in self.cursor.fetchall():
-            ret.add(i[0])
-        
-        #converts the set in a list and returns it.
-        return list(ret)
+    
 
 class PricesSQL():
     """

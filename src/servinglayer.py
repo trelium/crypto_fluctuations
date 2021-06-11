@@ -62,7 +62,7 @@ def setting_routine(input_text):
             user_preferences = extract_coinpct(preference,user_preferences)
         except:
             if errorcoin != None:
-                return (f'The coin "{errorcoin}" is currently not supported.\nPlease refer to https://api.coingecko.com/api/v3/coins/list for a complete list of supported coins.', {})
+                return (f'The coin "{errorcoin}" is currently unsupported. You may try entering new preferences', {}) #\nPlease refer to https://api.coingecko.com/api/v3/coins/list for a complete list of supported coins.
             else:
                 return (f'Please, type your preferences with the correct syntax.', {})
     return ('Preferences correctly imported!', user_preferences)
@@ -70,7 +70,7 @@ def setting_routine(input_text):
 
 def start_command(update, context):
     user = update.message.from_user
-    if not db.is_already_present(chat = str(update.message.chat.id)) or db.get_state(chat = str(update.message.chat.id)) == 'setting': #TODO second condition does not seem to work 
+    if not db.is_already_present(chat = str(update.message.chat.id)) or db.get_state(chat = str(update.message.chat.id)) == 'settings': #TODO second condition does not seem to work 
         settings_command(update, context)
     elif db.get_state(chat = str(update.message.chat.id)) == False:
         update.message.reply_text('Error starting service. Please contact the admin')
@@ -83,9 +83,8 @@ def start_command(update, context):
         update.message.reply_text('Error starting service(cannot set state to active). Please contact the admin')
 
 def settings_command(update, context): 
-    if db.set_state(chat = str(update.message.chat.id), user = str(update.message.chat.username), state = 'settings') != False: #TODO
+    if db.set_state(chat = str(update.message.chat.id), user = str(update.message.chat.username), state = 'settings') != False:
         update.message.reply_text('Please type the percentage of change in price (compared to yesterday\'s closing price in $) above which (or below which, prepend - sign) you want a notification to be pushed')
-        update.message.reply_text('This application currently supports five cryptocurrencies: Bitcoin, Ethereum, Ripple, Dogecoin and Binance coin.')
         update.message.reply_text('Please use the following format to specify the coins and percentages you\'re interested in: Coinname1 @ percentage1 ; Coinname2 @ percentage2')
     else:
         update.message.reply_text('Error updating preferences. Please contact the admin') 
@@ -106,9 +105,11 @@ def handle_message(update, context):
     if db.get_state(chat = str(update.message.chat.id)) == 'settings':
         response, dizionario = setting_routine(text) #process it 
         update.message.reply_text(response) #send response 
+        print(dizionario)
         if len(dizionario) != 0:
             db.set_preferences(chat = str(update.message.chat.id), preferences = dizionario) #TODO change format
             #print(update.message.chat.username) #debug only
+            print('ok')
             db.set_state(chat = str(update.message.chat.id), user = str(update.message.chat.username), state = 'ready')
             update.message.reply_text('You are ready to receive notifications. Issue command /start to activate the service.') 
     else: 
