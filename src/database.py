@@ -165,6 +165,21 @@ class UsersSQL():
         except:
             raise ValueError()
 
+    def get_coins_in_table(self):
+        self.cursor.execute("""select 
+                                    col.name as column_name
+                                from sys.tables as tab
+                                    inner join sys.columns as col
+                                    on tab.object_id = col.object_id
+                                    left join sys.types as t
+                                    on col.user_type_id = t.user_type_id
+                                where 
+                                    tab.name = 'users';""")
+        
+        excluded = {'user_id','chat_id','state','active'}
+        coins = {i[0] for i in list(self.cursor.fetchall()) if i[0] not in excluded and not i[0].startswith('latest_')}
+        return coins
+
     
 
 class PricesSQL():
