@@ -27,6 +27,7 @@ from projecttoolbox import *
 from database import UsersSQL
 from dotenv import load_dotenv
 import os
+import time
 
 load_dotenv()
 
@@ -43,7 +44,7 @@ class PriceScraper:
         # list of all cryptos that we are interested in. 
         # the list must contain the correct coin id to work
         # To get a list of all coin IDs, the request url is "https://api.coingecko.com/api/v3/coins/list"
-        self.cryptos=analyzedcryptos
+        self.cryptos=sanitizecoininput(analyzedcryptos)
 
         # Warning: due to the automatic granularity of the API, daily data will be used for duration above 90 days.
         # Hourly data will be used for duration between 1 day and 90 days.
@@ -92,27 +93,44 @@ class PriceScraper:
         #This code requests the data to the API and sends them to the MQTT
         self.objconnect()
         self.client.loop_start()
+
+        ncoin=0 #useful for debugging
         for crypto in self.cryptos:
-            response= requests.get("https://api.coingecko.com/api/v3/coins/"+crypto+"/market_chart?vs_currency=usd&days="+str(self.days))
-            response=response.json()
+            
+            ncoin+=1
+            print(ncoin,' ',crypto)
+
+
+            # Useful if the API doesn't work properly
+            scraped=False
+            while scraped==False:
+                try:
+                    response= requests.get("https://api.coingecko.com/api/v3/coins/"+crypto+"/market_chart?vs_currency=usd&days="+str(self.days))
+                    response=response.json()
+                    response['prices']
+                    scraped=True
+                except:
+                    time.sleep(2)
             
             # Sending tens of thousands of MQTT messages has proven to be fairly inefficient, as such we will send
             # less messages but bigger: each message contains the price history of the crypto.
-
+            list_to_publish=[]
             for pricedatapoint in response['prices']:
-                print(crypto,pricedatapoint)
-                self.mqttpublisher(crypto,pricedatapoint)
+                list_to_publish.append(list([crypto]+pricedatapoint))
+
+            #time.sleep(0.7)
+            self.mqttpublisher(crypto,list_to_publish)
 
         self.client.loop_stop()
 
     
-    def mqttpublisher(self,crypto,pricedatapoint):
+    def mqttpublisher(self,crypto,list_to_publish):
         #the actual mqtt publisher
         if self.connected==False:
             raise Exception('The object is not connected to a mqtt broker.')
 
         path='scraper/'+crypto
-        self.client.publish(path,str(pricedatapoint), qos=1)
+        self.client.publish(path,str(list_to_publish), qos=1)
         
         
 
@@ -122,10 +140,9 @@ if __name__ == "__main__":
     # Connects to the SQL utentibot to get a list of every coin the users are interested in.
     users=UsersSQL()
     supportedcoins=users.get_coins_in_table()
-    sanitizecoininput(list(supportedcoins))
-    mainscraper=PriceScraper(list(supportedcoins))
+    mainscraper=PriceScraper(list(supportedcoins),analyzeddays=200)
     #mainscraper=PriceScraper(['bitcoin','XRP','Tether','dogecoin','eth','LTC','ADA','DOT','BCH','BNB','XLM','Chainlink'],analyzeddays=210)
-    #mainscraper=PriceScraper(['bitcoin','eth','chainlink','XLM','dogecoin','LTC'],analyzeddays=200)
+    #mainscraper=PriceScraper(['bitcoin','eth','XRP','dogecoin','LTC'],analyzeddays=3000)
     mainscraper.scrapepricedata()
 
 # the mqtt topic where things are being published is scraper/nomecrypto.
