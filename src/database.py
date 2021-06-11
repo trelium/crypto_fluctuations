@@ -316,7 +316,6 @@ class PricesSQL():
 
         return dictret
 
-<<<<<<< HEAD
     
 
 class Predictions():
@@ -356,7 +355,6 @@ class Predictions():
     def save(self):
         with open(os.path.join(self.path,"currentprediction.json"), "w") as jsonfile:
             json.dump(self.data, jsonfile)
-=======
 
 class NotifierSQL():
     """
@@ -407,7 +405,8 @@ class NotifierSQL():
         self.execute_query(""" DELETE FROM dbo.notifier_preferences""")
         usercontent=self.execute_query(""" SELECT * FROM dbo.users""").fetchall()
         for user in usercontent:
-            pass
+            # insert chat_id, state and active
+            self.execute_query(f"""INSERT INTO dbo.users(chat_id, [state],active) VALUES ('{int(user[1])}','{user[2]}',{int(user[3][-1])});""")
 
     def execute_query(self,query:str(),commit=False):
         """
@@ -423,4 +422,3 @@ class NotifierSQL():
 
         return self.cursor 
 
->>>>>>> 5ccaf3e4aad4e20d3d4a624baff273aaa8541784
