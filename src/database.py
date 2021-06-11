@@ -279,13 +279,18 @@ class PricesSQL():
                 else:
                     updated=True
  
-    def get_prices(self, coin:str()):
+    def get_prices(self, coin:str(), all=False):
         """
-        Returns a list containing the closing prices marked as not deleted for a specified coin name
+        Returns a list containing the closing prices marked as not deleted for a specified coin name.
+        If arguemtn all is True, returns bot deleted and not deleted prices.
         Arguments:
             :coin: name of the coin. Must be a sanitized (as returned by projecttoolbox.sanitizecoininput()) 
+            :all: Bool: if true, all prices relative to a coin are returned. 
         """
-        prices = self.execute_query(f"SELECT price FROM dbo.priceshistory WHERE coin LIKE '{coin}' AND deleted=0;").fetchall()
+        if not all:
+            prices = self.execute_query(f"SELECT price FROM dbo.priceshistory WHERE coin LIKE '{coin}' AND deleted=0;").fetchall()
+        else:
+            prices = self.execute_query(f"SELECT price FROM dbo.priceshistory WHERE coin LIKE '{coin}';").fetchall()
         return prices
 
     def get_latest_prices(self,save=True):
@@ -306,3 +311,43 @@ class PricesSQL():
                 json.dump(dictret, out_file, indent = 0)
 
         return dictret
+
+    
+
+class Predictions():
+    """
+    Manages the daily price predictions by saving them to a dedicated json file. 
+    Arguemnts:
+        :path: path to folder where the file should be written 
+        :overwrite: should the already present predictions file be overwritten, set to True(default),
+                    else set to False. The latter option also keeps predictions 
+                    for coins that are not currently tracked by any user. 
+    """
+    def __init__(self, path:str = "data", overwrite=True):
+        self.path = path 
+        if not overwrite:
+            if os.path.isfile(os.path.join(path,"currentprediction.json")):
+                with open(os.path.join(self.path,"currentprediction.json"), "r") as jsonfile:
+                    try:
+                        self.data = json.load(jsonfile)
+                    except:
+                        self.data = {}
+            else:
+                with open(os.path.join(self.path,"currentprediction.json"), "w") as jsonfile:
+                    json.dump({},jsonfile)
+                    self.data = {}
+        else:
+            self.data = {}
+    
+    def set_no_pred(self,coin:str):
+        self.data[coin] = None
+    
+    def set_bull_pred(self,coin:str):
+        self.data[coin] = "Bullish"
+
+    def set_bear_pred(self,coin:str):
+        self.data[coin] = "Bearish"
+    
+    def save(self):
+        with open(os.path.join(self.path,"currentprediction.json"), "w") as jsonfile:
+            json.dump(self.data, jsonfile)

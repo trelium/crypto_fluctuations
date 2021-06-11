@@ -15,24 +15,57 @@ Functionalities include:
     * Saving results in an external SQL database  
 
 """
+
 from sklearn.linear_model import LinearRegression
-from database import PricesSQL
+from database import PricesSQL, Predictions
+from pprint import pprint
+import numpy as np
+
 #from dotenv import load_dotenv
 #import os
 
 #load_dotenv()
 
 #Instatiate database interface 
-db = PricesSQL()
+priceshistory = PricesSQL()
+predictions = Predictions()
 
 #Get list of all coins currently present in db
-cryptos = db.get_coins()
+cryptos = priceshistory.get_coins()
 
 for coin in cryptos:
-    prices = db.get_prices(coin)
+    prices = np.asarray([i[0] for i in priceshistory.get_prices(coin, all=True)]) #last is most recent 
+    #(-320:-120)first window for training: #[-200:], #[-320:-120], #[-440:-240] ... always -120
+    startidx = -320
+    endidx = -120
+    X = []
+    while abs(startidx)<len(prices): #make overlapping time windows for training 
+        X.append(prices[startidx,endidx])
+        startidx -= 120
+        endidx -= 120
+    
+    if len(X) == 0: #not enough training data 
+        predictions.set_no_pred(coin)
+        continue 
+    else: #training   
+        X = np.array(X) 
+        print(X)
+        Y = prices[endidx]
+        print(Y)
+        #fit linear model 
+        reg = LinearRegression().fit(X, Y)
+        print(reg)
+        
+    #Making prediction for current coin 
+    currentprices = np.asarray([i[0] for i in priceshistory.get_prices(coin, all=False)])
+    predprice = reg.predict(currentprices)
 
-    #fit linear model 
-    #reg = LinearRegression().fit(X, y)
-
-    #if value for today is higher than yesterday, put bullish in sql
+    #if value for today is higher than yesterday, write bullish in predictions, else bearish
+    if predprice > currentprices[-1]:
+        predictions.set_bull_pred(coin)
+    else:
+        predictions.set_bear_pred(coin)
+    
+#save all predictions to disk 
+predictions.save()
 
