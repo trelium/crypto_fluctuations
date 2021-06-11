@@ -116,9 +116,9 @@ if __name__ == "__main__":
 
     # Connects to the SQL utentibot to get a list of every coin the users are interested in.
     users=UsersSQL()
-    userspreferences=users.get_preferences()
+    userspreferences=users.get_coins_in_table()
 
-    mainscraper=PriceScraper(userspreferences)
+    mainscraper=PriceScraper(list(userspreferences))
 
 
     #mainscraper=PriceScraper(['bitcoin','XRP','Tether','dogecoin','eth','LTC','ADA','DOT','BCH','BNB','XLM','Chainlink'],analyzeddays=210)

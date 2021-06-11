@@ -260,6 +260,7 @@ class PricesSQL():
 
         #Actual updater
         for coin in cryptos:
+            print(coin) #useful for debugging
             updated=False
             while not updated:
                 if len(self.execute_query(f"SELECT * FROM dbo.priceshistory WHERE coin LIKE '{coin}' AND deleted=0;").fetchall())>200:
@@ -300,8 +301,10 @@ class PricesSQL():
             dictret[i[0]]=round(i[1],6)
 
         if save:
-            with open(os.path.join("data","latestprices.json"), "w") as out_file:
-                json.dump(dictret, out_file, indent = 0)
+            # I moved the data folder in src because it wasn't properly loading before
+            out_file = open(os.path.join("data","latestprices.json"), "w")
+            json.dump(dictret,out_file,indent=0)
+            out_file.close()
 
         return dictret
 
@@ -344,70 +347,4 @@ class Predictions():
     def save(self):
         with open(os.path.join(self.path,"currentprediction.json"), "w") as jsonfile:
             json.dump(self.data, jsonfile)
-
-class NotifierSQL():
-    """
-    Class to instantiate a connection and interact with the SQL database table 
-    containing the user preferences for each given coin and price threesold. The SQL also contains the date of
-    the last notification sent to that user for each crypto.
-    """
-
-    def __init__(self):
-        
-        # SQL connector
-        self.server = os.environ.get("SQL_SERVER")  #collation: SQL_Latin1_General_CP1_CI_AS
-        self.database = os.environ.get("SQL_DATABASE")
-        self.username = os.environ.get("SQL_USERNAME")
-        self.password = os.environ.get("SQL_PASSWORD")
-        self.driver= os.environ.get("SQL_DRIVER")
-        self.userstable= UsersSQL()
-        
-        #establish connection 
-        self.cnxn = pyodbc.connect('DRIVER='+self.driver+';SERVER='+self.server+';PORT=1433;DATABASE='+self.database+';UID='+self.username+';PWD='+ self.password)
-        self.cnxn.setencoding('utf-8')
-        self.cursor = self.cnxn.cursor()
-
-        #check if data is already present, otherwise create table 
-        self.cursor.execute("""SELECT  table_name name FROM INFORMATION_SCHEMA.TABLES """)
-        present_tables = self.cursor.fetchall()
-        if not 'notifier_preferences' in [elem for sublist in present_tables for elem in sublist]: #True if table is present
-            
-            # The creation of the table is dynamic, creating a column for each crypto the user is interested in.
-            # A column "{name of the crypto}_last_notification" is also produced to make sure the bot doesn't
-            # send too many notifications to the same user.
-            consideredcoins=self.userstable.get_preferences()
-            consideredcoinsstring=''
-            for crypto in consideredcoins:
-                consideredcoinsstring+=f', {crypto} FLOAT, {crypto}_last_notification BIGINT'
-
-            self.cursor.execute(f"""CREATE TABLE notifier_preferences(
-                                    user_id VARCHAR(300), 
-                                    chat_id VARCHAR(300) NOT NULL,
-                                    state VARCHAR(300), 
-                                    active BINARY(1)
-                                    {consideredcoinsstring} );""")
-            self.cursor.commit()
-            
-
-    def initialize_table(self):
-        # TODO
-        self.execute_query(""" DELETE FROM dbo.notifier_preferences""")
-        usercontent=self.execute_query(""" SELECT * FROM dbo.users""").fetchall()
-        for user in usercontent:
-            # insert chat_id, state and active
-            self.execute_query(f"""INSERT INTO dbo.users(chat_id, [state],active) VALUES ('{int(user[1])}','{user[2]}',{int(user[3][-1])});""")
-
-    def execute_query(self,query:str(),commit=False):
-        """
-        Wrapper method to execute SQL queries on the connected DB instance.
-        Returns:
-        :self.cursor: to make sure that you can use it for fetchall() functions whenever
-        you do a SELECT query.
-        """
-
-        self.cursor.execute(query)
-        if commit:
-            self.cursor.commit()
-
-        return self.cursor 
 
