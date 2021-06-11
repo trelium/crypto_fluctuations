@@ -38,7 +38,7 @@ class PriceScraper:
     MQTT server.
     """
 
-    def __init__(self,analyzedcryptos,analyzeddays=200,projectbroker='13.73.184.147'):
+    def __init__(self,analyzedcryptos,analyzeddays=200):
 
         # list of all cryptos that we are interested in. 
         # the list must contain the correct coin id to work
@@ -70,7 +70,7 @@ class PriceScraper:
 
 
         #mqtt connecter
-        self.broker=projectbroker
+        self.broker = os.environ.get("BROKER_ADDRESS")
         self.client=None
         self.connected=False
 
