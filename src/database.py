@@ -247,6 +247,16 @@ class PricesSQL():
         cryptos=[i[0] for i in cryptosquery.fetchall()]
         return cryptos
 
+    def get_coins_and_timevalues(self):
+        """
+        Returns a set filled with tuples of all the combination between "coin" and "value"
+        """
+        templist=self.execute_query("""SELECT coin, timevalue FROM dbo.priceshistory""").fetchall()
+        ret=set()
+        for i in templist:
+            ret.add(tuple(i))
+        return ret
+
     def update_time_window(self):
         """
         If the database has more than 200 non-deleted
@@ -348,3 +358,5 @@ class Predictions():
         with open(os.path.join(self.path,"currentprediction.json"), "w") as jsonfile:
             json.dump(self.data, jsonfile)
 
+test=PricesSQL()
+test.get_coins_and_timevalues()

@@ -146,12 +146,13 @@ class MqttSQL:
         #We're using a list to make appends because append in python has complexity O(1)
         index=0
         valuelst=[]
+        alreadypresent=self.db.get_coins_and_timevalues()
         while self.myqueue.empty()==False:
             tempvalue=self.myqueue.get()
             print(tempvalue)
             #IF the value is already inserted in the SQL, don't add it again, otherwise, add it.
-            
-            if self.db.value_already_present(tempvalue[1],tempvalue[0]):
+            #print(alreadypresent)
+            if tuple([tempvalue[0],tempvalue[1]]) in alreadypresent:
                 continue       
             #IF the value is already present in valuelst, don't add it to the query.
             if str(tempvalue) in valuelst:
@@ -183,9 +184,9 @@ class MqttSQL:
 if __name__ == "__main__":
 
     mqttsubber=MqttSQL()
-    mqttsubber.listenscrapers(timescraping=600,verbose=True,save=True)
+    mqttsubber.listenscrapers(timescraping=30,verbose=True,save=True)
     mqttsubber.sqlinserter()
-    mqttsubber.db.update_time_window()
+    #mqttsubber.db.update_time_window()
     mqttsubber.update_latest_prices()
     
 

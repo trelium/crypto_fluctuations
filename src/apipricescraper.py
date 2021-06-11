@@ -95,7 +95,12 @@ class PriceScraper:
         for crypto in self.cryptos:
             response= requests.get("https://api.coingecko.com/api/v3/coins/"+crypto+"/market_chart?vs_currency=usd&days="+str(self.days))
             response=response.json()
+            
+            # Sending tens of thousands of MQTT messages has proven to be fairly inefficient, as such we will send
+            # less messages but bigger: each message contains the price history of the crypto.
+
             for pricedatapoint in response['prices']:
+                print(crypto,pricedatapoint)
                 self.mqttpublisher(crypto,pricedatapoint)
 
         self.client.loop_stop()
