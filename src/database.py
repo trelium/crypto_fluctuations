@@ -199,7 +199,7 @@ class UsersSQL():
 
         return interestedusers  
     
-    def update_preferences(self,chat_id,crypto):
+    def latestnotification(self,chat_id,crypto):
         """
         Updates latest_update_{crypto} of an user by inserting the current timestamp.
         """

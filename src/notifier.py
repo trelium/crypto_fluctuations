@@ -1,23 +1,27 @@
 """
 ----------------------------------------------------------------
------ CoinGecko API current price Scraper and MQTT Publisher ---
+---------    MQTT subscriber and Notification sender   ---------
 ---------------------------------------------------------------- 
 Developed by Jacopo Mocellin, Riccardo Improta 
 University of Trento - June 2021.
 
+
 ---- Description----
-This scripts scrapes the current price data from the CoinGecko API, compares it to the price of 
-the day before, calculates the percentage change for each given coin and publishes the percentage
-change in an MQTT topic.
-The data includes the current price of each crypto the user is interested in.
+This scripts acts as the subscriber of the "percentagechange" MQTT topic.
+After that it processes the messages by looking which user should be notified about change of prices
+and sends a notification to that user.
 
 Core features:
-    * Scrapes the current price of each crypto in the users table.
-    * Compares it to the day before price and calculates the percentage change
-    * The percentage change of all coins is sent by a dictionary data structure
-    * Publishes the crypto data into a customized MQTT topic called percentagechange
-    * The day before prices are saved in a json and updated daily by mqttsub.py
-    * Messages are sent in QOS 1
+    * Subscribes to the mqtt topic with a static client id.
+    * Sends a notification to the user for each given crytpo if:
+        * their desired percentage of change has been met
+        * they have "active" in the dbo.users set as TRUE
+        * No notification for this crypto has been sent to the user today (used to not overload the user with information)
+
+
+
+Other functionalities:
+    * The MQTT subscriber is working in QOS 1
 
 
 """
@@ -51,7 +55,14 @@ class Notifier:
         self.myqueue=SimpleQueue()
     
     def listenpublisher(self,time_activation=30,verboselisten=False):
+        """
+        this function connects the class to the 'percentagechange' mqtt topic and pushes the messages in a queue
+        *verboselisten* is used for debugging and prints the message that the function is receiving.
+        *time_activation* is how much time will the subscriber be listening to the mqtt. Given that we do multiple connections in
+        start(), it is not necessary for time_activation to be high.
+        """
 
+        #connects to the mqtt topic
         def on_connect(client, userdata, flags, rc):
             if rc==0:
                 print("connected OK Returned code=",rc)
@@ -60,10 +71,10 @@ class Notifier:
                 print("Bad connection Returned code=",rc)
 
 
-        #This function specifies what happens every time we receive a message on the mqtt topic scraper/"name of the crypto"
+        #This function specifies what happens every time we receive a message on the mqtt topic 
         def on_message(client, userdata, msg):
-            #if save is set to "False", this code will print the message and stop the function.
-
+            
+            
             if verboselisten:
                 print(msg.topic+" "+str(msg.payload))
 
@@ -80,31 +91,52 @@ class Notifier:
         #client.on_message = on_message
         client.on_connect = on_connect
 
+        #time_activation is used here. the subscriber will listen for a set amount of time and then stops.
         client.loop_start()
         time.sleep(time_activation)
         client.loop_stop()
 
-    def processqueue(self):
 
+    def processqueue(self):
+        """
+        this function is used for processing the queue.
+        Each item of the queue gets extracted and converted to a dictionary.
+        After that, we will check for each crypto in the dictionary if any user
+        should receive a notification. If that is the case, we send the notification and update latest_notification.
+        """
+
+        #formatting of the queue element
         byte_str = self.myqueue.get()
         dict_str = byte_str.decode("UTF-8")
         newprices = ast.literal_eval(dict_str)
         yesterdaytimestamp=newprices.pop('timestamp of yesterday prices')
+
+
         for coin in newprices:
-            #print(coin,newprices[coin],yesterdaytimestamp)
             users_to_notify=self.dbusers.get_interested_users(crypto=coin,threesold=newprices[coin],considered_date=yesterdaytimestamp)
-            if users_to_notify!=[]:
-                for user in users_to_notify:
-                    self.SendNotification(chat_id=user[0],crypto=coin,percentage_change=newprices[coin])
-                    self.dbusers.update_preferences(chat_id=user[0],crypto=coin)
+            if users_to_notify!=[]: #checks if any user is interested in the given crypto
+                for user in users_to_notify: 
+                    self.SendNotification(chat_id=user[0],crypto=coin,percentage_change=newprices[coin]) #sends a notification to the user
+                    ## PER JACOPO: il codice di sotto è commentato perché per debuggare è più utile
+                    ## è il codice che aggiorna il timestamp sull'SQL. Se è commentato l'utente continuerà sempre 
+                    ## a ricevere notifiche. è utile per debuggare, ma ovviamente non è quello che vogliamo
+                    #self.dbusers.latestnotification(chat_id=user[0],crypto=coin) #updates the latest_notification for this crypto/user
+
+
 
     def SendNotification(self,chat_id,crypto,percentage_change):
+        # TODO
+        # JACOPO questa è la funzione che devi fare tu.
+        # Gli argument dovrebbero bastare, fammi sapere.
         print(chat_id,crypto,percentage_change)
         pass
 
 
 
     def start(self,forever=True,runningtime=None,verbose=False):
+        # Executes most of the previous scripts:
+        # If forever is True, it keeps checking for new messages every 40 seconds
+        # and automatically send notifications if necessary.
 
         if forever==True and runningtime==None:
             while True:
@@ -116,7 +148,7 @@ class Notifier:
             test.processqueue()
 
 
-# attiva api_percentage_change, attiva questo e dovrebbe arrivare un messaggio al minuto.
-
-test=Notifier()
-test.start()
+# attiva api_percentage_change per mandare i messaggi, attiva questo per riceverli.
+if __name__ == "__main__":
+    test=Notifier()
+    test.start()
