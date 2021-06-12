@@ -152,8 +152,7 @@ class MqttSQL:
                 # Our API, by default, sends us their most recent price data.
                 # This checks that our data actually comes from midnight.
                 # Works in GMT +01:00
-                timevalue=timevalue//1000
-                dt_object = datetime.datetime.fromtimestamp(timevalue)
+                dt_object = datetime.datetime.fromtimestamp(timevalue//1000)
                 if dt_object.hour!=1 or dt_object.minute!=0:
                     continue
 
