@@ -82,11 +82,25 @@ class NotifierPublish:
 
         # Creates a dictionary of all currentprices
         for crypto in self.latestprice:
-            response= requests.get(f'https://api.coingecko.com/api/v3/simple/price?ids={crypto}&vs_currencies=usd')
-            response=response.json()
-            response=dict(response)
+
+            #this try and except is to make sure that the api is working.
+            scraped=False
+            while scraped==False:
+                try:
+                    response= requests.get(f'https://api.coingecko.com/api/v3/simple/price?ids={crypto}&vs_currencies=usd')
+                    response=response.json()
+                    response[crypto]
+                    response=dict(response)
+                    scraped=True
+                except:
+                    time.sleep(1)
+            
+            
             self.currentprices[crypto]=round(response[crypto]['usd'],6)
         
+
+
+
         # Compares the prices from the day before (latestprices) to the
         # current prices and calculates the percentage change
         # the percentage change are formatted in a dictionary
@@ -134,5 +148,5 @@ class NotifierPublish:
             
 if __name__ == "__main__": 
     percentagepublisher=NotifierPublish()
-    percentagepublisher.start(forever=True)
+    percentagepublisher.start(forever=False)
 

@@ -51,6 +51,7 @@ def setting_routine(input_text):
         
     user_preferences = dict()
     user_message = str(input_text).lower()
+    user_message = user_message.replace(',',';') # Useful if the users puts in ',' instead of ';'  #Jacopo puoi confermarmi che funzionerà?
     user_message = user_message.rstrip(';') #Useful if the user puts in a final ';'
     if ';' in user_message: 
         user_message = user_message.split(';')
@@ -83,8 +84,14 @@ def start_command(update, context):
 
 def settings_command(update, context): 
     if db.set_state(chat = str(update.message.chat.id), user = str(update.message.chat.username), state = 'settings') != False:
-        update.message.reply_text('Please type the percentage of change in price (compared to yesterday\'s closing price in $) above which (or below which, prepend - sign) you want a notification to be pushed')
-        update.message.reply_text('Please use the following format to specify the coins and percentages you\'re interested in: Coinname1 @ percentage1 ; Coinname2 @ percentage2 ; ...')
+        
+        #update.message.reply_text('Please type the percentage of change in price (compared to yesterday\'s closing price in $) above which (or below which, prepend - sign) you want a notification to be pushed')
+
+        # Ho cercato di modificare il messaggio per informare l'utente che stiamo considerando il valore assoluto del cambiamento.
+        # Se non ti piace il nuovo messaggio puoi usare quello vecchio, l'ho lasciato due righe sopra.
+        update.message.reply_text('Please type the percentage of change in price (compared to yesterday\'s closing price in $). The Bot will send you a notification whenever the price goes above or below your desired percentage of change.')
+        # Dato che con i cambiamenti che ho fatto dovrebbe supportare le virgole, ho cambiato anche questo messaggio. Dimmi se ci sono problemi evidenti.
+        update.message.reply_text('Please use the following format to specify the coins and percentages you\'re interested in: Coinname1 @ percentage1 , Coinname2 @ percentage2 , ...')
         update.message.reply_text('To get a list of currently supported coins, issue command /supportedcoins')
     else:
         update.message.reply_text('Error updating preferences. Please contact the admin') 

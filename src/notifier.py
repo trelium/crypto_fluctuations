@@ -3,6 +3,8 @@ import os
 import time
 import paho.mqtt.client as mqtt
 from queue import SimpleQueue
+import ast
+import math
 
 
 load_dotenv()
@@ -18,7 +20,7 @@ class Notifier:
         #for large amount of data and multithreading, as such, they are fairly scalable.
         self.myqueue=SimpleQueue()
     
-    def listenpublisher(self, forever=True, time_activation=None):
+    def listenpublisher(self,time_activation=60,verbose=False):
 
         def on_connect(client, userdata, flags, rc):
             if rc==0:
@@ -32,8 +34,10 @@ class Notifier:
         def on_message(client, userdata, msg):
             #if save is set to "False", this code will print the message and stop the function.
             
-            print(msg.topic+" "+str(msg.payload))
+            if verbose:
+                print(msg.topic+" "+str(msg.payload))
 
+            self.myqueue.put(msg.payload)
         
         #MQTT connector
         client = mqtt.Client(client_id="Notifier_sub",clean_session=False)
@@ -46,15 +50,35 @@ class Notifier:
         #client.on_message = on_message
         client.on_connect = on_connect
 
-        if forever and time_activation==None:
-            client.loop_forever()
-        else:
-            if time_activation==None:
-                time_activation=600
+        client.loop_start()
+        time.sleep(time_activation)
+        client.loop_stop()
 
-            client.loop_start()
-            time.sleep(time_activation)
-            client.loop_stop()
+    def processqueue(self):
+
+        byte_str = self.myqueue.get()
+        dict_str = byte_str.decode("UTF-8")
+        newprices = ast.literal_eval(dict_str)
+
+
+        print(newprices)
+        for coin in newprices:
+            pass
+            #TODO
+
+    def start(self,forever=True,runningtime=None):
+
+        if forever==True and runningtime==None:
+            while True:
+                self.listenpublisher()
+                test.processqueue()
+        
+        else:
+            test.listenpublisher(time_activation=runningtime)
+            test.processqueue()
+
+
+# attiva api_percentage_change, attiva questo e dovrebbe arrivare un messaggio al minuto.
 
 test=Notifier()
-test.listenpublisher()
+test.start()

@@ -22,6 +22,7 @@ from dotenv import load_dotenv
 import os
 import json
 import requests
+import math
 
 load_dotenv()
 
@@ -157,8 +158,9 @@ class UsersSQL():
                     self.cnxn.commit()                        
             
             for coin in preferences:
+                # We consider the absolute value to be able to measure the Gain/Loss
                 self.cursor.execute(f"""UPDATE dbo.users 
-                                    SET {coin} = {preferences[coin]}                                    
+                                    SET {coin} = {abs(preferences[coin])}                                    
                                     WHERE chat_id = '{chat}' """)
                 self.cnxn.commit()
                 
