@@ -84,6 +84,7 @@ class NotifierPublish:
         for crypto in self.latestprice['prices']:
 
             #this try and except is to make sure that the api is working.
+            #Various tries are made until the API actually sends the json
             scraped=False
             while scraped==False:
                 try:
@@ -123,6 +124,7 @@ class NotifierPublish:
         if self.connected==False:
             raise Exception('The object is not connected to a mqtt broker.')
         
+        #We save the timestamp of latestprices.json. It will be useful for comparing it to today prices for notifications
         self.percentagechange['timestamp of yesterday prices']=self.latestprice['timestamp']
 
 
@@ -136,7 +138,7 @@ class NotifierPublish:
         self.pricesql.get_latest_prices()
 
     def start(self,forever=True):
-        # Execute most of the previous scripts:
+        # Executes most of the previous scripts:
         # Scrapes the data and publishes it
         # If forever is True, it does so every minute
         if forever==True:

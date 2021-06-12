@@ -102,6 +102,7 @@ class PriceScraper:
 
 
             # Useful if the API doesn't work properly
+            #Various tries are made until the API actually sends the json
             scraped=False
             while scraped==False:
                 try:

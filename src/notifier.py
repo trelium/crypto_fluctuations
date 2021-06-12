@@ -1,3 +1,31 @@
+"""
+----------------------------------------------------------------
+----- CoinGecko API current price Scraper and MQTT Publisher ---
+---------------------------------------------------------------- 
+Developed by Jacopo Mocellin, Riccardo Improta 
+University of Trento - June 2021.
+
+---- Description----
+This scripts scrapes the current price data from the CoinGecko API, compares it to the price of 
+the day before, calculates the percentage change for each given coin and publishes the percentage
+change in an MQTT topic.
+The data includes the current price of each crypto the user is interested in.
+
+Core features:
+    * Scrapes the current price of each crypto in the users table.
+    * Compares it to the day before price and calculates the percentage change
+    * The percentage change of all coins is sent by a dictionary data structure
+    * Publishes the crypto data into a customized MQTT topic called percentagechange
+    * The day before prices are saved in a json and updated daily by mqttsub.py
+    * Messages are sent in QOS 1
+
+
+"""
+
+
+
+
+
 from dotenv import load_dotenv
 import os
 import time

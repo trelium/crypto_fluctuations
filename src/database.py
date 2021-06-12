@@ -185,6 +185,13 @@ class UsersSQL():
 
 
     def get_interested_users(self,crypto,threesold,considered_date):
+        """
+        Used to understand to which user the notification should be sent.
+        It only selects the users that are interested in the given crypto IF:
+            * their desired percentage of change has been met
+            * they have "active" in the dbo.users set as TRUE
+            * No notification for this crypto has been sent to the user today
+        """
         interestedusers=self.cursor.execute(f"""SELECT chat_id from dbo.users WHERE (
                     "{crypto}"<{abs(threesold)} AND active=1 AND 
                     (("latest_update_{crypto}" IS NULL) OR ("latest_update_{crypto}"<{considered_date}))
@@ -193,6 +200,10 @@ class UsersSQL():
         return interestedusers  
     
     def update_preferences(self,chat_id,crypto):
+        """
+        Updates latest_update_{crypto} of an user by inserting the current timestamp.
+        """
+
         self.cursor.execute(f"""UPDATE dbo.users 
                                     SET "latest_update_{crypto}" = {round(datetime.timestamp(datetime.now()))}                                    
                                     WHERE chat_id = '{chat_id}' """)
