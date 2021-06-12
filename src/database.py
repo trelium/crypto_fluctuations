@@ -16,6 +16,7 @@ the SQL database instance. This stores:
 
 """
 
+from datetime import time
 import pyodbc
 from pycoingecko import CoinGeckoAPI
 from dotenv import load_dotenv
@@ -308,9 +309,14 @@ class PricesSQL():
 
         latestprices=self.execute_query("SELECT coin,price FROM dbo.priceshistory WHERE timevalue=(SELECT MAX(timevalue) FROM dbo.priceshistory)").fetchall()
         dictret={}
-
+        timestamp=self.execute_query("SELECT MAX(timevalue) FROM dbo.priceshistory").fetchall()[0][0]
+        
+        dictret['timestamp']=timestamp
+        pricesdata={}
         for i in latestprices:
-            dictret[i[0]]=round(i[1],6)
+            pricesdata[i[0]]=round(i[1],6)
+        dictret['prices']=pricesdata
+        print(dictret)
 
         if save:
             # I moved the data folder in src because it wasn't properly loading before
@@ -359,6 +365,3 @@ class Predictions():
     def save(self):
         with open(os.path.join(self.path,"currentprediction.json"), "w") as jsonfile:
             json.dump(self.data, jsonfile)
-
-test=PricesSQL()
-test.get_coins_and_timevalues()

@@ -1,4 +1,6 @@
 {
+"timestamp": 1616889600000,
+"prices": {
 "theta-token": 11.842157,
 "celsius-degree-token": 4.883723,
 "polkadot": 32.623519,
@@ -48,4 +50,5 @@
 "bitcoin": 55832.41811,
 "ripple": 0.547868,
 "algorand": 1.160409
+}
 }
