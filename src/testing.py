@@ -1,6 +1,7 @@
 import requests
 from database import UsersSQL
 import re
+from datetime import datetime
 """
 response= requests.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false")
 response=response.json()
@@ -13,10 +14,17 @@ with open('quryfile.txt',mode='w') as file:
         file.write(f'{i} FLOAT, \n latest_update_{i} BIGINT,\n')
 """
 
-substr = 'bigfij@56,78%'.split('@')
-if ',' not in  substr[1] and re.match('-{0,1}[0-9]+\.{0,1}[0-9]*%{0,1}', substr[1].replace(' ','')):
-    foundpct = float(re.findall('-{0,1}[0-9]+\.{0,1}[0-9]*%{0,1}', substr[1]).pop().rstrip('%'))
-elif '.' not in  substr[1] and re.match('-{0,1}[0-9]+,{0,1}[0-9]*%{0,1}', substr[1].replace(' ','')): #changes only a comma from previous regex
-    foundpct = float(re.findall('-{0,1}[0-9]+,{0,1}[0-9]*%{0,1}', substr[1]).pop().rstrip('%').replace(',','.'))
+# substr = 'bigfij@56,78%'.split('@')
+# if ',' not in  substr[1] and re.match('-{0,1}[0-9]+\.{0,1}[0-9]*%{0,1}', substr[1].replace(' ','')):
+#     foundpct = float(re.findall('-{0,1}[0-9]+\.{0,1}[0-9]*%{0,1}', substr[1]).pop().rstrip('%'))
+# elif '.' not in  substr[1] and re.match('-{0,1}[0-9]+,{0,1}[0-9]*%{0,1}', substr[1].replace(' ','')): #changes only a comma from previous regex
+#     foundpct = float(re.findall('-{0,1}[0-9]+,{0,1}[0-9]*%{0,1}', substr[1]).pop().rstrip('%').replace(',','.'))
 
-print(foundpct)
+# print(foundpct)
+
+timestamp=1606262400000//1000
+print(timestamp)
+dt_object = datetime.fromtimestamp(timestamp)
+print(dt_object.hour,dt_object.minute)
+
+print("dt_object =", dt_object)
