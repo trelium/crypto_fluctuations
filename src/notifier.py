@@ -65,9 +65,7 @@ class Notifier:
         for coin in newprices:
             #print(coin,newprices[coin],yesterdaytimestamp)
             users_to_notify=self.dbusers.get_interested_users(crypto=coin,threesold=newprices[coin],considered_date=yesterdaytimestamp)
-            print(users_to_notify)
             if users_to_notify!=[]:
-                print(newprices[coin])
                 for user in users_to_notify:
                     self.SendNotification(chat_id=user[0],crypto=coin,percentage_change=newprices[coin])
                     self.dbusers.update_preferences(chat_id=user[0],crypto=coin)
