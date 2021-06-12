@@ -38,8 +38,7 @@ def setting_routine(input_text):
             foundpct = float(re.findall('-{0,1}[0-9]+,{0,1}[0-9]*%{0,1}', substr[1]).pop().rstrip('%').replace(',','.'))
         else:
             raise ValueError 
-        
-        coinname = substr[0].rstrip(' ') #remove trailing whitespace, if any
+        coinname = substr[0].replace(' ','') #remove trailing whitespace, if any
         try:
             coinname = sanitizecoininput(coinname)[0] 
             user_dict[coinname] = foundpct
@@ -50,7 +49,26 @@ def setting_routine(input_text):
             raise ValueError
         
     user_preferences = dict()
-    user_message = str(input_text).lower().rstrip(';')#remove trailing ; , if any
+    user_message = str(input_text).lower()#remove trailing ; , if any
+
+
+    user_message=user_message.replace(',',';') # Useful if the users puts in ',' instead of ';' 
+    # # Converts the word in a list and iterates through it. It then substitutes
+    #  ";" with '.' whenever the letter right after the one we are analyzing is numeric.
+    list_user_message=list(user_message)
+    for index,lettera in enumerate(list_user_message): #iterates through the list
+        if lettera==';':        #
+            if (index+1)==len(list_user_message):
+                continue
+            
+            #we only convert ";" to "." if the character right after it is numeric 
+            if list_user_message[index+1].isnumeric():
+                list_user_message[index]='.'
+    user_message="".join(list_user_message)   
+
+    user_message=user_message.rstrip(';')#remove trailing, if any
+    
+
     if ';' in user_message: 
         user_message = user_message.split(';')
     else:
@@ -83,7 +101,8 @@ def start_command(update, context):
 def settings_command(update, context): 
     if db.set_state(chat = str(update.message.chat.id), user = str(update.message.chat.username), state = 'settings') != False:
         update.message.reply_text('Please type the percentage of change in price (compared to yesterday\'s closing price in $). The Bot will send you a notification whenever the price goes above or below your desired percentage of change.')
-        update.message.reply_text('Please use the following format to specify the coins and percentages you\'re interested in: Coinname1 @ percentage1 ; Coinname2 @ percentage2 , ...')
+        update.message.reply_text('Please use the following format to specify the coins and percentages you\'re interested in: Coinname1 @ percentage1 , Coinname2 @ percentage2 , ...')
+        update.message.reply_text('For example, these different ways of formatting are all accepted: _ bitcoin @20\.2, eth @ 35,6% , xrp @16 _ ',parse_mode='MarkdownV2')
         update.message.reply_text('To get a list of currently supported coins, issue command /supportedcoins')
     else:
         update.message.reply_text('Error updating preferences. Please contact the admin') 
