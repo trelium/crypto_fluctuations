@@ -20,7 +20,7 @@ class Notifier:
         #for large amount of data and multithreading, as such, they are fairly scalable.
         self.myqueue=SimpleQueue()
     
-    def listenpublisher(self,time_activation=60,verbose=False):
+    def listenpublisher(self,time_activation=30,verboselisten=False):
 
         def on_connect(client, userdata, flags, rc):
             if rc==0:
@@ -33,8 +33,8 @@ class Notifier:
         #This function specifies what happens every time we receive a message on the mqtt topic scraper/"name of the crypto"
         def on_message(client, userdata, msg):
             #if save is set to "False", this code will print the message and stop the function.
-            
-            if verbose:
+
+            if verboselisten:
                 print(msg.topic+" "+str(msg.payload))
 
             self.myqueue.put(msg.payload)
@@ -59,22 +59,23 @@ class Notifier:
         byte_str = self.myqueue.get()
         dict_str = byte_str.decode("UTF-8")
         newprices = ast.literal_eval(dict_str)
+        yesterdaytimestamp=newprices.pop('timestamp of yesterday prices')
 
-
+        print(yesterdaytimestamp)
         print(newprices)
         for coin in newprices:
             pass
             #TODO
 
-    def start(self,forever=True,runningtime=None):
+    def start(self,forever=True,runningtime=None,verbose=False):
 
         if forever==True and runningtime==None:
             while True:
-                self.listenpublisher()
+                self.listenpublisher(verboselisten=verbose)
                 test.processqueue()
         
         else:
-            test.listenpublisher(time_activation=runningtime)
+            test.listenpublisher(verboselisten=verbose,time_activation=runningtime)
             test.processqueue()
 
 

@@ -81,7 +81,7 @@ class NotifierPublish:
 
 
         # Creates a dictionary of all currentprices
-        for crypto in self.latestprice:
+        for crypto in self.latestprice['prices']:
 
             #this try and except is to make sure that the api is working.
             scraped=False
@@ -108,8 +108,10 @@ class NotifierPublish:
         for crypto in self.currentprices:
             # details about the formula:
             # https://www.calculatorsoup.com/calculators/algebra/percent-change-calculator.php
-            self.percentagechange[crypto]=round(((self.currentprices[crypto] - self.latestprice[crypto])/self.latestprice[crypto])*100,6)
-
+            if self.latestprice['prices'][crypto]!=0:
+                self.percentagechange[crypto]=round(((self.currentprices[crypto] - self.latestprice['prices'][crypto])/self.latestprice['prices'][crypto])*100,6)
+            else:
+                self.percentagechange[crypto]=0
         #published the data into the MQTT and disconnects
         self.__mqttpublisher()
         self.client.loop_stop()
@@ -120,6 +122,9 @@ class NotifierPublish:
         #the used topic is "percentagechange"
         if self.connected==False:
             raise Exception('The object is not connected to a mqtt broker.')
+        
+        self.percentagechange['timestamp of yesterday prices']=self.latestprice['timestamp']
+
 
         path='percentagechange'
         self.client.publish(path,str(self.percentagechange), qos=1)
@@ -148,5 +153,5 @@ class NotifierPublish:
             
 if __name__ == "__main__": 
     percentagepublisher=NotifierPublish()
-    percentagepublisher.start(forever=False)
+    percentagepublisher.start(forever=True)
 
