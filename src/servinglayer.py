@@ -32,14 +32,14 @@ def setting_routine(input_text):
     errorcoin = None
     def extract_coinpct (inputpreference, user_dict):
         substr = inputpreference.split('@')
-        if re.match('-{0,1}[0-9]+\.{0,1}[0-9]*%{0,1}', substr[1].replace(' ','')):
+        if ',' not in  substr[1] and re.match('-{0,1}[0-9]+\.{0,1}[0-9]*%{0,1}', substr[1].replace(' ','')):
             foundpct = float(re.findall('-{0,1}[0-9]+\.{0,1}[0-9]*%{0,1}', substr[1]).pop().rstrip('%'))
-        elif re.match('-{0,1}[0-9]+,{0,1}[0-9]*%{0,1}', substr[1].replace(' ','')): #changes only a comma from previous regex
-            foundpct = float(re.findall('-{0,1}[0-9]+,{0,1}[0-9]*%{0,1}', substr[1]).pop().rstrip('%'))
+        elif '.' not in  substr[1] and re.match('-{0,1}[0-9]+,{0,1}[0-9]*%{0,1}', substr[1].replace(' ','')): #changes only a comma from previous regex
+            foundpct = float(re.findall('-{0,1}[0-9]+,{0,1}[0-9]*%{0,1}', substr[1]).pop().rstrip('%').replace(',','.'))
         else:
             raise ValueError 
         
-        coinname = substr[0].replace(' ','')
+        coinname = substr[0].rstrip(' ') #remove trailing whitespace, if any
         try:
             coinname = sanitizecoininput(coinname)[0] 
             user_dict[coinname] = foundpct
@@ -50,9 +50,7 @@ def setting_routine(input_text):
             raise ValueError
         
     user_preferences = dict()
-    user_message = str(input_text).lower()
-    user_message = user_message.replace(',',';') # Useful if the users puts in ',' instead of ';'  #Jacopo puoi confermarmi che funzionerà?
-    user_message = user_message.rstrip(';') #Useful if the user puts in a final ';'
+    user_message = str(input_text).lower().rstrip(';')#remove trailing ; , if any
     if ';' in user_message: 
         user_message = user_message.split(';')
     else:
@@ -62,9 +60,9 @@ def setting_routine(input_text):
             user_preferences = extract_coinpct(preference,user_preferences)
         except:
             if errorcoin != None:
-                return (f'The coin "{errorcoin}" is currently unsupported. No preferences were set.', {}) 
+                return (f'The coin "{errorcoin}" is currently unsupported. No preferences were set, you may issue the /settings command again', {}) 
             else:
-                return (f'Please, type your preferences with the correct syntax.', {})
+                return (f'Please, type your preferences using the correct syntax.', {})
     return ('Preferences correctly imported!', user_preferences)
     
 
@@ -84,14 +82,8 @@ def start_command(update, context):
 
 def settings_command(update, context): 
     if db.set_state(chat = str(update.message.chat.id), user = str(update.message.chat.username), state = 'settings') != False:
-        
-        #update.message.reply_text('Please type the percentage of change in price (compared to yesterday\'s closing price in $) above which (or below which, prepend - sign) you want a notification to be pushed')
-
-        # Ho cercato di modificare il messaggio per informare l'utente che stiamo considerando il valore assoluto del cambiamento.
-        # Se non ti piace il nuovo messaggio puoi usare quello vecchio, l'ho lasciato due righe sopra.
         update.message.reply_text('Please type the percentage of change in price (compared to yesterday\'s closing price in $). The Bot will send you a notification whenever the price goes above or below your desired percentage of change.')
-        # Dato che con i cambiamenti che ho fatto dovrebbe supportare le virgole, ho cambiato anche questo messaggio. Dimmi se ci sono problemi evidenti.
-        update.message.reply_text('Please use the following format to specify the coins and percentages you\'re interested in: Coinname1 @ percentage1 , Coinname2 @ percentage2 , ...')
+        update.message.reply_text('Please use the following format to specify the coins and percentages you\'re interested in: Coinname1 @ percentage1 ; Coinname2 @ percentage2 , ...')
         update.message.reply_text('To get a list of currently supported coins, issue command /supportedcoins')
     else:
         update.message.reply_text('Error updating preferences. Please contact the admin') 
@@ -117,7 +109,7 @@ def handle_message(update, context):
         response, dizionario = setting_routine(text) #process it 
         update.message.reply_text(response) #send response 
         if len(dizionario) != 0:
-            db.set_preferences(chat = str(update.message.chat.id), preferences = dizionario) #TODO change format
+            db.set_preferences(chat = str(update.message.chat.id), preferences = dizionario) 
             #print(update.message.chat.username) #debug only
             db.set_state(chat = str(update.message.chat.id), user = str(update.message.chat.username), state = 'ready')
             update.message.reply_text('You are ready to receive notifications. Issue command /start to activate the service.') 

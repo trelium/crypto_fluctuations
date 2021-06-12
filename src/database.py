@@ -160,7 +160,7 @@ class UsersSQL():
             for coin in preferences:
                 # We consider the absolute value to be able to measure the Gain/Loss
                 self.cursor.execute(f"""UPDATE dbo.users 
-                                    SET {coin} = {abs(preferences[coin])}                                    
+                                    SET "{coin}" = {abs(preferences[coin])}                                    
                                     WHERE chat_id = '{chat}' """)
                 self.cnxn.commit()
                 

@@ -3,7 +3,7 @@
 ---- Cryptocurrency Price Trend Predictor  ----
 -----------------------------------------------
 Developed by Jacopo Mocellin, Riccardo Improta 
-University of Trento - May 2021.
+University of Trento - June 2021.
 
 ---- Description----
 Script taking care of computing price trend predictions for the 
@@ -11,8 +11,8 @@ Cryptocurrency Predictor service.
 
 Functionalities include:
     * Ingesting time series data for a set of cryptocurrencies
-    * Computing bullish/bearish market condition for each crypto 
-    * Saving results in an external SQL database  
+    * Computing bullish/bearish market condition for each crypto
+    * Saving results in a local json file
 
 """
 
@@ -38,9 +38,10 @@ for coin in cryptos:
     #(-320:-120)first window for training: #[-200:], #[-320:-120], #[-440:-240] ... always -120
     startidx = -320
     endidx = -120
-    X = []
+    X, Y = [], []
     while abs(startidx)<len(prices): #make overlapping time windows for training 
-        X.append(prices[startidx,endidx])
+        X.append(prices[startidx:endidx])
+        Y.append(prices[endidx])
         startidx -= 120
         endidx -= 120
     
@@ -49,19 +50,17 @@ for coin in cryptos:
         continue 
     else: #training   
         X = np.array(X) 
-        print(X)
-        Y = prices[endidx]
-        print(Y)
+        Y = np.array(Y) 
         #fit linear model 
         reg = LinearRegression().fit(X, Y)
-        print(reg)
         
     #Making prediction for current coin 
     currentprices = np.asarray([i[0] for i in priceshistory.get_prices(coin, all=False)])
+    currentprices = np.expand_dims(currentprices, axis=0)
     predprice = reg.predict(currentprices)
 
     #if value for today is higher than yesterday, write bullish in predictions, else bearish
-    if predprice > currentprices[-1]:
+    if predprice > np.squeeze(currentprices)[-1]:
         predictions.set_bull_pred(coin)
     else:
         predictions.set_bear_pred(coin)
