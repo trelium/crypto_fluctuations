@@ -5,7 +5,7 @@ import paho.mqtt.client as mqtt
 from queue import SimpleQueue
 import ast
 import math
-
+from database import UsersSQL
 
 load_dotenv()
 
@@ -15,6 +15,8 @@ class Notifier:
         
         #MQTT address
         self.broker = os.environ.get("BROKER_ADDRESS")
+
+        self.dbusers=UsersSQL()
 
         #This class uses a Python queue to operate: note that python queue are optimized
         #for large amount of data and multithreading, as such, they are fairly scalable.
@@ -60,12 +62,21 @@ class Notifier:
         dict_str = byte_str.decode("UTF-8")
         newprices = ast.literal_eval(dict_str)
         yesterdaytimestamp=newprices.pop('timestamp of yesterday prices')
-
-        print(yesterdaytimestamp)
-        print(newprices)
         for coin in newprices:
-            pass
-            #TODO
+            #print(coin,newprices[coin],yesterdaytimestamp)
+            users_to_notify=self.dbusers.get_interested_users(crypto=coin,threesold=newprices[coin],considered_date=yesterdaytimestamp)
+            print(users_to_notify)
+            if users_to_notify!=[]:
+                print(newprices[coin])
+                for user in users_to_notify:
+                    self.SendNotification(chat_id=user[0],crypto=coin,percentage_change=newprices[coin])
+                    self.dbusers.update_preferences(chat_id=user[0],crypto=coin)
+
+    def SendNotification(self,chat_id,crypto,percentage_change):
+        print(chat_id,crypto,percentage_change)
+        pass
+
+
 
     def start(self,forever=True,runningtime=None,verbose=False):
 

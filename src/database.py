@@ -16,7 +16,7 @@ the SQL database instance. This stores:
 
 """
 
-from datetime import time
+from datetime import date, datetime, time
 import pyodbc
 from pycoingecko import CoinGeckoAPI
 from dotenv import load_dotenv
@@ -183,7 +183,23 @@ class UsersSQL():
         coins = {i[0] for i in list(self.cursor.fetchall()) if i[0] not in excluded and not i[0].startswith('latest_')}
         return coins
 
+
+    def get_interested_users(self,crypto,threesold,considered_date):
+        interestedusers=self.cursor.execute(f"""SELECT chat_id from dbo.users WHERE (
+                    "{crypto}"<{abs(threesold)} AND active=1 AND 
+                    (("latest_update_{crypto}" IS NULL) OR ("latest_update_{crypto}"<{considered_date}))
+                    );""").fetchall()
+
+        return interestedusers  
     
+    def update_preferences(self,chat_id,crypto):
+        self.cursor.execute(f"""UPDATE dbo.users 
+                                    SET "latest_update_{crypto}" = {round(datetime.timestamp(datetime.now()))}                                    
+                                    WHERE chat_id = '{chat_id}' """)
+        self.cnxn.commit()
+
+
+
 
 class PricesSQL():
     """
@@ -310,7 +326,7 @@ class PricesSQL():
         latestprices=self.execute_query("SELECT coin,price FROM dbo.priceshistory WHERE timevalue=(SELECT MAX(timevalue) FROM dbo.priceshistory)").fetchall()
         dictret={}
         timestamp=self.execute_query("SELECT MAX(timevalue) FROM dbo.priceshistory").fetchall()[0][0]
-        
+        timestamp=timestamp//1000
         dictret['timestamp']=timestamp
         pricesdata={}
         for i in latestprices:
