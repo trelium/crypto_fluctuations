@@ -184,16 +184,16 @@ class UsersSQL():
         return coins
 
 
-    def get_interested_users(self,crypto,threesold,considered_date):
+    def get_interested_users(self,crypto,threshold,considered_date):
         """
         Used to understand to which user the notification should be sent.
-        It only selects the users that are interested in the given crypto IF:
+        It only selects the users that are interested in the given crypto IF: 
             * their desired percentage of change has been met
             * they have "active" in the dbo.users set as TRUE
             * No notification for this crypto has been sent to the user today
         """
         interestedusers=self.cursor.execute(f"""SELECT chat_id from dbo.users WHERE (
-                    "{crypto}"<{abs(threesold)} AND active=1 AND 
+                    "{crypto}"<{abs(threshold)} AND active=1 AND 
                     (("latest_update_{crypto}" IS NULL) OR ("latest_update_{crypto}"<{considered_date}))
                     );""").fetchall()
 

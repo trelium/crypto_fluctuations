@@ -56,8 +56,8 @@ def setting_routine(input_text):
     # # Converts the word in a list and iterates through it. It then substitutes
     #  ";" with '.' whenever the letter right after the one we are analyzing is numeric.
     list_user_message=list(user_message)
-    for index,lettera in enumerate(list_user_message): #iterates through the list
-        if lettera==';':        #
+    for index,letter in enumerate(list_user_message): #iterates through the list
+        if letter==';':        
             if (index+1)==len(list_user_message):
                 continue
             
@@ -100,6 +100,7 @@ def start_command(update, context):
 
 def settings_command(update, context): 
     if db.set_state(chat = str(update.message.chat.id), user = str(update.message.chat.username), state = 'settings') != False:
+        stop_command(update, context)
         update.message.reply_text('Please type the percentage of change in price (compared to yesterday\'s closing price in $). The Bot will send you a notification whenever the price goes above or below your desired percentage of change.')
         update.message.reply_text('Please use the following format to specify the coins and percentages you\'re interested in: Coinname1 @ percentage1 , Coinname2 @ percentage2 , ...')
         update.message.reply_text('For example, these different ways of formatting are all accepted: _ bitcoin @20\.2, eth @ 35,6% , xrp @16 _ ',parse_mode='MarkdownV2')

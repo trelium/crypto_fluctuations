@@ -6,7 +6,7 @@ Developed by Jacopo Mocellin, Riccardo Improta
 University of Trento - June 2021.
 
 ---- Description----
-This scripts scrapes the data of the CoinGecko API and publishes that data to the correct
+This script scrapes the data of the CoinGecko API and publishes that data to the correct
 MQTT topic. The data includes the price history of each selected crypto.
 
 Core features:
@@ -44,7 +44,7 @@ class PriceScraper:
         # list of all cryptos that we are interested in. 
         # the list must contain the correct coin id to work
         # To get a list of all coin IDs, the request url is "https://api.coingecko.com/api/v3/coins/list"
-        self.cryptos=sanitizecoininput(analyzedcryptos)
+        self.cryptos=sanitizecoininput(analyzedcryptos) #TODO might raise issues if the top 50 coins returned by the API are different from the ones used as columns.
 
         # Warning: due to the automatic granularity of the API, daily data will be used for duration above 90 days.
         # Hourly data will be used for duration between 1 day and 90 days.
