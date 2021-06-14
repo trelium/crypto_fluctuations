@@ -100,8 +100,6 @@ class NotifierPublish:
             self.currentprices[crypto]=round(response[crypto]['usd'],6)
         
 
-
-
         # Compares the prices from the day before (latestprices) to the
         # current prices and calculates the percentage change
         # the percentage change are formatted in a dictionary

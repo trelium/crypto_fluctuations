@@ -359,15 +359,20 @@ class Predictions():
     """
     Manages the daily price predictions by saving them to a dedicated json file. 
     Arguemnts:
-        :path: path to folder where the file should be written 
+        :path: path to folder where the file should be written or read.
         :overwrite: should the already present predictions file be overwritten, set to True(default),
                     else set to False. The latter option also keeps predictions 
-                    for coins that are not currently tracked by any user. 
+                    for coins that might not currently be supported by the service. 
     """
-    def __init__(self, path:str = "data", overwrite=True):
-        self.path = path 
+    def __init__(self, path:str = None, overwrite=True):
+        if path == None:
+            projectfolder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            self.path = os.path.join(projectfolder,'data') 
+        else:
+            self.path = path 
+        
         if not overwrite:
-            if os.path.isfile(os.path.join(path,"currentprediction.json")):
+            if os.path.isfile(os.path.join(self.path,"currentprediction.json")):
                 with open(os.path.join(self.path,"currentprediction.json"), "r") as jsonfile:
                     try:
                         self.data = json.load(jsonfile)
@@ -392,3 +397,6 @@ class Predictions():
     def save(self):
         with open(os.path.join(self.path,"currentprediction.json"), "w") as jsonfile:
             json.dump(self.data, jsonfile)
+
+    def get_pred(self, coin:str):
+        return self.data[coin]

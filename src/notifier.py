@@ -26,10 +26,6 @@ Other functionalities:
 
 """
 
-
-
-
-
 from dotenv import load_dotenv
 import os
 import time
@@ -37,9 +33,11 @@ import paho.mqtt.client as mqtt
 from queue import SimpleQueue
 import ast
 import math
+import json
 
 import telegram
-from database import UsersSQL
+from telegram.files.file import File
+from database import UsersSQL,  Predictions
 
 load_dotenv()
 
@@ -56,6 +54,10 @@ class Notifier:
         #for large amount of data and multithreading, as such, they are fairly scalable.
         self.myqueue=SimpleQueue()
         self.bot = telegram.Bot(token=os.environ.get("KEY"))
+        
+        #read predictions
+        self.predictions = Predictions(overwrite=False)
+
     
     def listen_publisher(self,time_activation=30,verboselisten=False):
         """
@@ -130,7 +132,17 @@ class Notifier:
 
 
     def send_notification(self,chat_id,crypto,percentage_change):
-        msg = f'Alert: current {crypto} price is {percentage_change}% with respect to yesterday’s closing. We predict bullish/bearish market conditions, with an expected closing price higher/lower than  yesterday’s. 📈📉'
+        """
+        Composes the message and sends it to the specified user 
+        """
+        if self.predictions.get_pred(crypto) == 'Bullish':
+            ending = '\nWe predict bullish 🔥 market conditions, with an expected closing price higher than  yesterday’s 📈'
+        elif self.predictions.get_pred(crypto) == 'Bearish':
+            ending = '\nWe predict bearish 👎 market conditions, with an expected closing price lower than yesterday’s 📉'
+        else:
+            ending = ''
+        
+        msg = f'Alert: current price for {crypto} is {percentage_change:.2f}% with respect to yesterday’s closing.' + ending
         self.bot.sendMessage(chat_id=chat_id, text=msg)
         print(chat_id,crypto,percentage_change)
         pass
