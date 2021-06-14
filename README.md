@@ -23,7 +23,7 @@
 
 ### How the code works in detail:
 
-It is recommended to consult the [project wiki](https://github.com/trelium/crypto_fluctuations/wiki) for more informations if the user wants to use or enchance the code.
+It is recommended to consult the [project wiki](https://github.com/trelium/crypto_fluctuations/wiki/Crypto_fluctuations-wiki) for more informations if the user wants to use or enchance the code.
 
 <a name="usage"/>
 
