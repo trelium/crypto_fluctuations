@@ -72,7 +72,7 @@ SQL_DRIVER="{ODBC Driver 17 for SQL Server}"
 ```
 
 As for the needed tables: the code in _database.py_ will generate them automatically if they are not already present in the database.
-The two tables will be called _pricehistory_ and _users_
+The two tables will be called _pricehistory_ and _users_.
 
 --------
 
