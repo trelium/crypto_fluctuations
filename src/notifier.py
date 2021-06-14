@@ -165,7 +165,7 @@ class Notifier:
             test.process_queue()
 
 
-# attiva api_percentage_change per mandare i messaggi, attiva questo per riceverli.
+# attiva apicurrentpercentages per mandare i messaggi, attiva questo per riceverli.
 if __name__ == "__main__":
     test=Notifier()
     test.start(verbose=True)

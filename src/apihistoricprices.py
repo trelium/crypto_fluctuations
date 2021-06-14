@@ -44,7 +44,7 @@ class PriceScraper:
         # list of all cryptos that we are interested in. 
         # the list must contain the correct coin id to work
         # To get a list of all coin IDs, the request url is "https://api.coingecko.com/api/v3/coins/list"
-        self.cryptos=sanitizecoininput(analyzedcryptos) #TODO might raise issues if the top 50 coins returned by the API are different from the ones used as columns.
+        self.cryptos=sanitizecoininput(analyzedcryptos) 
 
         # Warning: due to the automatic granularity of the API, daily data will be used for duration above 90 days.
         # Hourly data will be used for duration between 1 day and 90 days.

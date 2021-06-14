@@ -43,7 +43,7 @@ load_dotenv()
 class MqttSQL:
     """
     This object fulfills the "sub" related role in our scraper.
-    It listens to the mqtt publisher of the apipricescraper and it can load the data it receives in the
+    It listens to the mqtt publisher of the apihistoricprices and it can load the data it receives in the
     specified SQL.
     """
 
