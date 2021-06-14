@@ -43,13 +43,14 @@ class NotifierPublish:
 
         # Reads the prices from the day before by using the dedicated json
         self.pricesql=PricesSQL()
+        projectfolder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         try:
-            with open(os.path.join("data","latestprices.json")) as f: 
+            with open(os.path.join(projectfolder,"data","latestprices.json")) as f:
                 self.latestprice=json.load(f)
         # If the json is not present, create it
         except:
             self.pricesql.get_latest_prices()
-            with open(os.path.join("data","latestprices.json")) as f:
+            with open(os.path.join(projectfolder,"data","latestprices.json"), "w") as f:
                 self.latestprice=json.load(f)           
 
 

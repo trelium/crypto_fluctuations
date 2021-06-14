@@ -346,10 +346,10 @@ class PricesSQL():
         print(dictret)
 
         if save:
-            # I moved the data folder in src because it wasn't properly loading before
-            out_file = open(os.path.join("data","latestprices.json"), "w")
-            json.dump(dictret,out_file,indent=0)
-            out_file.close()
+            projectfolder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            with open(os.path.join(projectfolder,"data","latestprices.json"), "w") as out_file:
+                json.dump(dictret,out_file,indent=0)
+            
 
         return dictret
 
