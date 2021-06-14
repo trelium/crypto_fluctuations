@@ -106,3 +106,10 @@ The
 ## Telegram Bot tutorial and examples:
 An environment variable called 'KEY' should be present with your API key for telegram bots.
 `KEY=123456789abcdefghi`
+
+The commands available to the user are:
+- \help to guide the user to guide the bot
+- \start to start the bot
+- \stop to stop the bot
+- \settings for updating the user preferences
+- \supportecoins to know which coins are supported by the bot
