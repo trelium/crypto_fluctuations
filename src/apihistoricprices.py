@@ -32,12 +32,16 @@ class PriceScraper:
     Scrapes the price from the CoinGecko API and sends them to the scraper/"Name of the coin" topic in our 
     MQTT server.
     """
-    def __init__(self,analyzedcryptos,analyzeddays=200):
+    def __init__(self,analyzedcryptos = None,analyzeddays=200):
 
         # list of all cryptos that we are interested in. 
         # the list must contain the correct coin id to work
         # To get a list of all coin IDs, the request url is "https://api.coingecko.com/api/v3/coins/list"
-        self.cryptos=sanitizecoininput(analyzedcryptos) 
+        if analyzedcryptos == None:
+            db = UsersSQL()
+            self.cryptos = list(db.get_coins_in_table())
+        else:
+             self.cryptos = analyzedcryptos
 
         # Warning: due to the automatic granularity of the API, daily data will be used for duration above 90 days.
         # Hourly data will be used for duration between 1 day and 90 days.
@@ -138,9 +142,7 @@ if __name__ == "__main__":
     print('Daily prices ingestion started: ', datetime.now()) # <- used for debugging
 
     # Connects to the SQL utentibot to get a list of every coin the users are interested in.
-    users=UsersSQL()
-    supportedcoins=users.get_coins_in_table()
-    mainscraper=PriceScraper(list(supportedcoins),analyzeddays=200)
+    mainscraper=PriceScraper(analyzeddays=200)
     mainscraper.scrapepricedata()
 
 # the mqtt topic where things are being published is scraper/nomecrypto.

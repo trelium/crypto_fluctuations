@@ -1,7 +1,7 @@
 """
---------------------------------------------------------
----- Project Toolbox: useful and reusable functions ----
--------------------------------------------------------- 
+---------------------------------------------------------
+---- Project Toolbox: project-wide utility functions ----
+---------------------------------------------------------
 Developed by Jacopo Mocellin, Riccardo Improta 
 University of Trento - June 2021.
 
@@ -15,14 +15,19 @@ Functions currently included:
 
 import requests
 
-def sanitizecoininput(analyzedcryptos):
+from database import UsersSQL
+
+def sanitizecoininput(analyzedcryptos, dbinstance:UsersSQL):
     """
-    Checks if the input list contains only coins that are listed in the CoinGecko API.
-    If a symbol (es: btc) is used, this function converts the list to the actual id.
+    First, converts input names to those reuired by the ConGeckoAPI.
+    If a symbol (es: btc) is used, this function converts the name to the actual crypto id.
+    Then, it returns a list containing only those input names that are also among the currently 
+    accepted ones (as returned by get_coins_in_table)
     If the coin is present multiple times in the input list, this function will remove the redundancy 
     Arguments:
         :analyzedcryptos: list of strings
     """
+    trackedcoins = dbinstance.get_coins_in_table()
 
     #Checks if the input is a list, otherwise, put it in a list
     if type(analyzedcryptos)!=list:
@@ -32,7 +37,7 @@ def sanitizecoininput(analyzedcryptos):
     
 
     #this code fills "tempid" with all possible ids and "tempsymbol" with all possible symbols (es:"eth" for ethereum)
-    response= requests.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false")
+    response= requests.get("https://api.coingecko.com/api/v3/coins/list")
     response=response.json()
     tempid=set()
     tempsymbol={}
@@ -55,7 +60,10 @@ def sanitizecoininput(analyzedcryptos):
             raise ValueError(f"\nThe '{crypto}' cryptocurrency is not listed in the coin list of CoinGecko.\nPlease refer to https://api.coingecko.com/api/v3/coins/list for a complete list of supported coins.")
 
     #returns a sanitized list (each crypto in lowercase, each symbol translated to the corresponding crypto)
-    return ret
+    #containing only those names currently part of get_coins_in_table
+    sanitized = [coin for coin in ret if coin in trackedcoins]
+    
+    return sanitized
 
 
 #If you want to test the sanitizer:

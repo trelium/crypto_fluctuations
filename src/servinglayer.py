@@ -39,7 +39,7 @@ def setting_routine(input_text):
             raise ValueError 
         coinname = substr[0].replace(' ','') #remove trailing whitespace, if any
         try:
-            coinname = sanitizecoininput(coinname)[0] 
+            coinname = sanitizecoininput(coinname,dbinstance=db)[0] 
             user_dict[coinname] = foundpct
             return user_dict
         except:
