@@ -106,6 +106,10 @@ The
 ## Telegram Bot tutorial and examples:
 An environment variable called 'KEY' should be present with your API key for telegram bots.
 `KEY=123456789abcdefghi`
+	
+The bot is fairly self-explanatory and should not be difficult for the end user to use.
+The users have to input a list of the cryptos they are interested in and the percentage of gains/loss after which they want to be notified. The bot will send a maximum of one notification for crypto for day to not overload the user.
+
 
 The commands available to the user are:
 - *\help* to guide the user to guide the bot
@@ -113,3 +117,6 @@ The commands available to the user are:
 - *\stop* to stop the bot
 - *\settings* for updating the user preferences
 - *\supportedcoins* to know which coins are supported by the bot
+	
+Example of the working of the bot:
+
