@@ -67,7 +67,6 @@ def sanitizecoininput(analyzedcryptos, dbinstance:UsersSQL):
 
 
 #If you want to test the sanitizer:
-#print(sanitizecoininput(['bitCoin','eTh','LTc']))
+# test=UsersSQL()
+# print(sanitizecoininput(['bitCoin','eTh','LTc'],test))
 #print(sanitizecoininput('parola')) <= Will raise an error
-#print(sanitizecoininput(['bitcoin','bitcoin']))
-
