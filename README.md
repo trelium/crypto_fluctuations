@@ -118,5 +118,13 @@ The commands available to the user are:
 - *\settings* for updating the user preferences
 - *\supportedcoins* to know which coins are supported by the bot
 	
-Example of the working of the bot:
+### Example of the bot:
+	
+Here the user starts the bot.
+<img src="https://raw.githubusercontent.com/trelium/crypto_fluctuations/main/data/Telegram%20screenshots/1.jpg" width="20%" height="20%" />
 
+The user then states his/her preferences and activates the notification service. 
+<img src="https://raw.githubusercontent.com/trelium/crypto_fluctuations/main/data/Telegram%20screenshots/2.jpg" width="20%" height="20%" />
+
+After a few minutes, the user receives his/her notifications and after that he/she stops the service to not receive more notifications the day after.
+<img src="https://raw.githubusercontent.com/trelium/crypto_fluctuations/main/data/Telegram%20screenshots/3.jpg" width="20%" height="20%" />
