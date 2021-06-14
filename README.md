@@ -17,6 +17,9 @@ It is recommended to consult the [project wiki](https://github.com/trelium/crypt
 
 ## Usage
 
+------
+# TODO: Sta roba va modificata dopo il docker
+
 ### Environment
 
 This project requires Python 3.
@@ -29,3 +32,33 @@ The libraries defined in the `requirements.txt` file should be installed.
 ```bash
 pip install -r requirements.txt
 ```
+
+## Questi due non credo serva dockerizzarli:
+
+### MQTT broker
+serve un mqtt
+
+### SQL server
+serve un microsoft sql server
+
+--------
+
+### Running the code
+
+This project offers different services that can be run separately:
+* These two services should be run once a day:
+	* _apihistoricprices.py_ is used to scrape the price histories and publishes the in a customized 	scraper/<name of the crypto> topic
+	* _historicingestion.py_ subscribes to the aforementioned topics and loads the data in a Microsoft SQL 	Server table
+
+* These three services will run until manually stopped:
+	* _apicurrentpercentages.py_ calculates the daily price percentage change of each crypto and sends them in 	a 	"percentagechange" MQTT Topic
+	* _notifier.py_ subscribes to the "percentagechange" topic, filters which user should be notified and 	sends the notifications.
+	* _servinglayer.py_ is used to start the telegram bot.
+
+The MQTT services run at QOS 1, as such they can be run synchronously or asynchronously.
+
+The other services, _predictor.py_,_projecttoolbox.py_ and _database.py_ , manage some back-end processes and as such it is not necessary for the user to run them.
+The 
+
+
+### Supported data storage
