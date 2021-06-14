@@ -49,12 +49,35 @@ pip install -r requirements.txt
 ### Questi due non credo serva dockerizzarli:
 
 ### MQTT broker
-serve un mqtt
+A functioning MQTT broker must be setup to use most of the services.
+An environment variable called 'BROKER_ADDRESS' should be present with the IP of the broker.
+for example: `BROKER_ADDRESS="localhost"`
+
+It is recommended to edit the `/etc/mosquitto/mosquitto.conf` file by inserting these two changes:
+```
+allow_anonymous true #(the code will work even without this setting, but it's easier to implement and debug new features while if it allows anonymous)
+max_inflight_messages 0 #(otherwise it will not function properly in asynchronous mode)
+```
 
 ### SQL server
-serve un microsoft sql server
+A database in Microsoft SQL server should be present for the project to work.
+Various environment variables should be present for the code to work flawlessly:
+```
+# Credentials to access SQL instance on 
+SQL_SERVER="<name>.database.windows.net"
+SQL_DATABASE=
+SQL_USERNAME=
+SQL_PASSWORD=
+SQL_DRIVER="{ODBC Driver 17 for SQL Server}"
+```
+
+As for the needed tables: the code in _database.py_ will generate them automatically if they are not already present in the database.
+The two tables will be called _pricehistory_ and _users_
 
 --------
+
+
+
 
 <a name="running"/>
 
@@ -81,3 +104,5 @@ The
 -------
 
 ## Telegram Bot tutorial and examples:
+An environment variable called 'KEY' should be present with your API key for telegram bots.
+`KEY=123456789abcdefghi`
