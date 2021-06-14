@@ -133,7 +133,7 @@ def handle_message(update, context):
             db.set_preferences(chat = str(update.message.chat.id), preferences = dizionario) 
             #print(update.message.chat.username) #debug only
             db.set_state(chat = str(update.message.chat.id), user = str(update.message.chat.username), state = 'ready')
-            update.message.reply_text('You are ready to receive notifications. Issue command /start to activate the service.') 
+            update.message.reply_text('You are ready to receive notifications. Issue command /start to activate the service. A maximum of one notification for crypto will be sent each day.') 
     else: 
         update.message.reply_text('To input new preferences, first issue command /settings')
 
