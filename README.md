@@ -2,6 +2,17 @@
 
  * Design and implement a big data system for detecting and predicting sudden variations (> X% on a daily basis) for a set of cryptocurrencies. 
 
+
+##### Table of Contents  
+* [Project overview](#overview)  
+* [Usage](#usage) 
+* [Running the code](#running)
+* [Telegram Bot](#telegram)
+
+<a name="overview"/>
+
+-------
+
 ## Project overview
 - This project scrapes the closing price history of all the most used cryptos. 
 - The prices are then processed in different ways:
@@ -14,10 +25,12 @@
 
 It is recommended to consult the [project wiki](https://github.com/trelium/crypto_fluctuations/wiki) for more informations if the user wants to use or enchance the code.
 
+<a name="usage"/>
+
+------
 
 ## Usage
 
-------
 # TODO: Sta roba va modificata dopo il docker
 
 ### Environment
@@ -33,7 +46,7 @@ The libraries defined in the `requirements.txt` file should be installed.
 pip install -r requirements.txt
 ```
 
-## Questi due non credo serva dockerizzarli:
+### Questi due non credo serva dockerizzarli:
 
 ### MQTT broker
 serve un mqtt
@@ -43,7 +56,10 @@ serve un microsoft sql server
 
 --------
 
-### Running the code
+<a name="running"/>
+
+
+## Running the code
 
 This project offers different services that can be run separately:
 * These two services should be run once a day:
@@ -60,5 +76,8 @@ The MQTT services run at QOS 1, as such they can be run synchronously or asynchr
 The other services, _predictor.py_,_projecttoolbox.py_ and _database.py_ , manage some back-end processes and as such it is not necessary for the user to run them.
 The 
 
+<a name="telegram"/>
+	
+-------
 
-### Supported data storage
+## Telegram Bot tutorial and examples:
