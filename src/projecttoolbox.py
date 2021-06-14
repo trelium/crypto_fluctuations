@@ -22,7 +22,7 @@ def sanitizecoininput(analyzedcryptos, dbinstance:UsersSQL):
     First, converts input names to those reuired by the ConGeckoAPI.
     If a symbol (es: btc) is used, this function converts the name to the actual crypto id.
     Then, it returns a list containing only those input names that are also among the currently 
-    accepted ones (as returned by get_coins_in_table)
+    accepted ones (as returned by get_coins_in_table) - an instanced database is necessary for the function to operate.
     If the coin is present multiple times in the input list, this function will remove the redundancy 
     Arguments:
         :analyzedcryptos: list of strings

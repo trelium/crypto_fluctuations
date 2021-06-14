@@ -142,7 +142,7 @@ if __name__ == "__main__":
     print('Daily prices ingestion started: ', datetime.now()) # <- used for debugging
 
     # Connects to the SQL utentibot to get a list of every coin the users are interested in.
-    mainscraper=PriceScraper(analyzeddays=200)
+    mainscraper=PriceScraper()
     mainscraper.scrapepricedata()
 
 # the mqtt topic where things are being published is scraper/nomecrypto.
