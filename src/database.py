@@ -197,7 +197,6 @@ class UsersSQL():
                     "{crypto}"<{abs(threshold)} AND active=1 AND 
                     (("latest_update_{crypto}" IS NULL) OR ("latest_update_{crypto}"<{considered_date}))
                     );""").fetchall()
-
         return interestedusers  
     
     def latestnotification(self,chat_id,crypto):
