@@ -134,4 +134,3 @@ The user then states his/her preferences and activates the notification service.
 
 After a few minutes, the user receives his/her notifications and after that he/she stops the service to not receive more notifications the day after.
 
-<img src="https://raw.githubusercontent.com/trelium/crypto_fluctuations/main/data/Telegram%20screenshots/3.jpg" width="20%" height="20%" />
