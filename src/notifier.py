@@ -50,7 +50,7 @@ class Notifier:
         self.predictions = Predictions(overwrite=False)
 
     
-    def listen_publisher(self,time_activation=30,verboselisten=False):
+    def listen_publisher(self,time_activation=20,verboselisten=False):
         """
         this function connects the class to the 'percentagechange' mqtt topic and pushes the messages in a queue.
         Arguments: \\
