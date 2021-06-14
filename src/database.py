@@ -6,14 +6,15 @@ Developed by Jacopo Mocellin, Riccardo Improta
 University of Trento - June 2021.
 
 ---- Description----
-Tis module contains the utility class used in order to interact with 
+This module contains the utility class used in order to interact with 
 the SQL database instance. This stores: 
     * Table priceshistory: historic price data for set of cryptos.
         Interface for this table is provided by UsersSQL class.
     * Table users: user's chat states and preferences 
         Interface for this table is provided by PricesSQL class.
 
-
+This module also contains a wrapper class to manage prices predictions 
+data stored in a local json file (class Predictions)
 """
 
 from datetime import date, datetime, time
@@ -327,7 +328,7 @@ class PricesSQL():
             prices = self.execute_query(f"SELECT price FROM dbo.priceshistory WHERE coin LIKE '{coin}';").fetchall()
         return prices
 
-    def get_latest_prices(self,save=True): #TODO change 
+    def get_latest_prices(self,save=True):
         """
         Update the "latestprices.json" with the latest prices of the coins.
         It does so by selecting the most recent timestamp from dbo.priceshistory and the coin prices for that date.
@@ -353,14 +354,13 @@ class PricesSQL():
 
         return dictret
 
-    
 
 class Predictions():
     """
     Manages the daily price predictions by saving them to a dedicated json file. 
     Arguemnts:
-        :path: path to folder where the file should be written or read.
-        :overwrite: should the already present predictions file be overwritten, set to True(default),
+        * path: path to folder where the file should be written or read.
+        * overwrite: should the already present predictions file be overwritten, set to True(default),
                     else set to False. The latter option also keeps predictions 
                     for coins that might not currently be supported by the service. 
     """

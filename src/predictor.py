@@ -12,7 +12,7 @@ Cryptocurrency Predictor service.
 Functionalities include:
     * Ingesting time series data for a set of cryptocurrencies
     * Computing bullish/bearish market condition for each crypto
-    * Saving results in a local json file
+    * Saving results to a specified storage
 
 """
 

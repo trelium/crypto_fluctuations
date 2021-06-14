@@ -5,7 +5,6 @@
 Developed by Jacopo Mocellin, Riccardo Improta 
 University of Trento - June 2021.
 
-
 ---- Description----
 This scripts acts as the subscriber of the "percentagechange" MQTT topic.
 After that it processes the messages by looking which user should be notified about change of prices
@@ -18,11 +17,8 @@ Core features:
         * they have "active" in the dbo.users set as TRUE
         * No notification for this crypto has been sent to the user today (used to not overload the user with information)
 
-
-
 Other functionalities:
     * The MQTT subscriber is working in QOS 1
-
 
 """
 
@@ -32,11 +28,7 @@ import time
 import paho.mqtt.client as mqtt
 from queue import SimpleQueue
 import ast
-import math
-import json
-
 import telegram
-from telegram.files.file import File
 from database import UsersSQL,  Predictions
 
 load_dotenv()
@@ -44,7 +36,6 @@ load_dotenv()
 class Notifier:
 
     def __init__(self):
-        
         #MQTT address
         self.broker = os.environ.get("BROKER_ADDRESS")
 
@@ -124,11 +115,7 @@ class Notifier:
             if users_to_notify!=[]: #checks if any user is interested in the given crypto
                 for user in users_to_notify: 
                     self.send_notification(chat_id=user[0],crypto=coin,percentage_change=newprices[coin]) #sends a notification to the user
-                    ## PER JACOPO: il codice di sotto è commentato perché per debuggare è più utile
-                    ## è il codice che aggiorna il timestamp sull'SQL. Se è commentato l'utente continuerà sempre 
-                    ## a ricevere notifiche. è utile per debuggare, ma ovviamente non è quello che vogliamo
-                    #self.dbusers.latestnotification(chat_id=user[0],crypto=coin) #updates the latest_notification for this crypto/user
-
+                    self.dbusers.latestnotification(chat_id=user[0],crypto=coin) #updates the latest_notification for this crypto/user
 
 
     def send_notification(self,chat_id,crypto,percentage_change):
@@ -148,7 +135,6 @@ class Notifier:
         pass
 
 
-
     def start(self,forever=True,runningtime=None,verbose=False):
         """
         Executes most of the previous scripts:
@@ -165,7 +151,6 @@ class Notifier:
             test.process_queue()
 
 
-# attiva apicurrentpercentages per mandare i messaggi, attiva questo per riceverli.
 if __name__ == "__main__":
     test=Notifier()
     test.start(verbose=True)

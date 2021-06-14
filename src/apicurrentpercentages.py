@@ -1,6 +1,6 @@
 """
 ----------------------------------------------------------------
------ CoinGecko API current price Scraper and MQTT Publisher ---
+----- CoinGecko API Current Price Scraper and MQTT Publisher ---
 ---------------------------------------------------------------- 
 Developed by Jacopo Mocellin, Riccardo Improta 
 University of Trento - June 2021.
@@ -16,12 +16,11 @@ Core features:
     * Compares it to the day before price and calculates the percentage change
     * The percentage change of all coins is sent by a dictionary data structure
     * Publishes the crypto data into a customized MQTT topic called percentagechange
-    * The day before prices are saved in a json and updated daily by mqttsub.py
+    * The day before prices are saved in a json and updated daily by historicingestion.py
     * Messages are sent in QOS 1
 
 
 """
-
 
 import requests
 from database import UsersSQL,PricesSQL
@@ -39,8 +38,6 @@ class NotifierPublish:
     """
 
     def __init__(self):
-
-
         # Reads the prices from the day before by using the dedicated json
         self.pricesql=PricesSQL()
         projectfolder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -52,7 +49,6 @@ class NotifierPublish:
             self.pricesql.get_latest_prices()
             with open(os.path.join(projectfolder,"data","latestprices.json"), "w") as f:
                 self.latestprice=json.load(f)           
-
 
         #MQTT connector
         self.broker = os.environ.get("BROKER_ADDRESS")
@@ -74,12 +70,10 @@ class NotifierPublish:
         self.client.connect(self.broker, 1883, 60)
         self.connected=True
 
-
     def __scraper_percentagechange(self):
-        #This code requests the data to the API and sends them to the dedicated topi in the MQTT
+        #This code requests the data to the API and sends them to the dedicated topic in the MQTT
         self.__objconnect()
         self.client.loop_start()
-
 
         # Creates a dictionary of all currentprices
         for crypto in self.latestprice['prices']:
@@ -97,9 +91,7 @@ class NotifierPublish:
                 except:
                     time.sleep(1)
             
-            
             self.currentprices[crypto]=round(response[crypto]['usd'],6)
-        
 
         # Compares the prices from the day before (latestprices) to the
         # current prices and calculates the percentage change
@@ -116,7 +108,6 @@ class NotifierPublish:
         self.__mqttpublisher()
         self.client.loop_stop()
 
-
     def __mqttpublisher(self):
         #the actual mqtt publisher
         #the used topic is "percentagechange"
@@ -126,11 +117,8 @@ class NotifierPublish:
         #We save the timestamp of latestprices.json. It will be useful for comparing it to today prices for notifications
         self.percentagechange['timestamp of yesterday prices']=self.latestprice['timestamp']
 
-
         path='percentagechange'
         self.client.publish(path,str(self.percentagechange), qos=1)
-
-
 
     def update_latest_prices(self):
         #Updates the json file to include the latest prices from the SQL table

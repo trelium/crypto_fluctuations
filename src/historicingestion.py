@@ -24,8 +24,6 @@ Other functionalities:
 
 """
 
-
-
 import pyodbc
 import paho.mqtt.client as mqtt
 import time
@@ -36,9 +34,7 @@ from dotenv import load_dotenv
 import os
 from ast import literal_eval
 
-
 load_dotenv()
-
 
 class MqttSQL:
     """
@@ -46,11 +42,7 @@ class MqttSQL:
     It listens to the mqtt publisher of the apihistoricprices and it can load the data it receives in the
     specified SQL.
     """
-
     def __init__(self):
-        
-
-        
         #MQTT address
         self.broker = os.environ.get("BROKER_ADDRESS")
         
@@ -141,7 +133,6 @@ class MqttSQL:
             for i in cryptohistory:
 
                 # Here we format the list element
-                
                 coin=i[0]
                 timevalue=i[1]
                 price=i[2]

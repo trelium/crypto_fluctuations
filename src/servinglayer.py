@@ -13,7 +13,6 @@ Functionalities include:
 
 """
 
-from datetime import datetime
 from telegram.ext import * 
 import re
 from database import UsersSQL
@@ -158,9 +157,4 @@ def main(): #Note: conversationHandler
 
 if __name__ == '__main__':
     main()
-
-
-
-#now = datetime.now()
-#'Buongiorno! è {} e ho trovato la percentuale {}'.format(now.strftime('%d/%m/%y, %H:%M:%S'),foundpct)
 

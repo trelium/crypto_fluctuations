@@ -14,11 +14,7 @@ Core features:
     * Publishes the crypto data into a customized MQTT topic called scraper/<name of the crypto>
     * Messages are sent in QOS 1
 
-
 """
-
-
-
 
 import requests
 import paho.mqtt.client as mqtt
@@ -31,14 +27,11 @@ import time
 
 load_dotenv()
 
-
-
 class PriceScraper:
     """ 
     Scrapes the price from the CoinGecko API and sends them to the scraper/"Name of the coin" topic in our 
     MQTT server.
     """
-
     def __init__(self,analyzedcryptos,analyzeddays=200):
 
         # list of all cryptos that we are interested in. 
@@ -69,14 +62,16 @@ class PriceScraper:
         else:
             raise ValueError('Input days should be numeric. "max" is currently not supported.')
 
-
         #mqtt connecter
         self.broker = os.environ.get("BROKER_ADDRESS")
         self.client=None
         self.connected=False
 
+
     def objconnect(self):
-        #connects this object to the mqtt broker that is saved in __init__
+        """
+        Connects this object to the mqtt broker that is saved in __init__
+        """
         def on_connect(client, userdata, flags, rc):
             if rc==0:
                 print("connected OK Returned code=",rc)
@@ -90,7 +85,9 @@ class PriceScraper:
 
 
     def scrapepricedata(self):
-        #This code requests the data to the API and sends them to the MQTT
+        """
+        Requests the data to the API and sends them to the MQTT
+        """
         self.objconnect()
         self.client.loop_start()
 
@@ -126,7 +123,9 @@ class PriceScraper:
 
     
     def mqttpublisher(self,crypto,list_to_publish):
-        #the actual mqtt publisher
+        """
+        The actual mqtt publisher
+        """
         if self.connected==False:
             raise Exception('The object is not connected to a mqtt broker.')
 
@@ -136,14 +135,12 @@ class PriceScraper:
         
 
 if __name__ == "__main__":
-    print(datetime.now()) # <- used for debugging
+    print('Daily prices ingestion started: ', datetime.now()) # <- used for debugging
 
     # Connects to the SQL utentibot to get a list of every coin the users are interested in.
     users=UsersSQL()
     supportedcoins=users.get_coins_in_table()
     mainscraper=PriceScraper(list(supportedcoins),analyzeddays=200)
-    #mainscraper=PriceScraper(['bitcoin','XRP','Tether','dogecoin','eth','LTC','ADA','DOT','BCH','BNB','XLM','Chainlink'],analyzeddays=210)
-    #mainscraper=PriceScraper(['bitcoin','eth','XRP','dogecoin','LTC'],analyzeddays=3000)
     mainscraper.scrapepricedata()
 
 # the mqtt topic where things are being published is scraper/nomecrypto.
