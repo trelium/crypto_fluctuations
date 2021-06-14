@@ -25,6 +25,7 @@ from dotenv import load_dotenv
 import os
 import time
 
+
 load_dotenv()
 
 class PriceScraper:
@@ -41,7 +42,9 @@ class PriceScraper:
             db = UsersSQL()
             self.cryptos = list(db.get_coins_in_table())
         else:
-             self.cryptos = analyzedcryptos
+            db = UsersSQL()
+            self.cryptos = sanitizecoininput(analyzedcryptos,db)
+        
 
         # Warning: due to the automatic granularity of the API, daily data will be used for duration above 90 days.
         # Hourly data will be used for duration between 1 day and 90 days.

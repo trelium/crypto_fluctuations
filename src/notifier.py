@@ -130,7 +130,7 @@ class Notifier:
         else:
             ending = ''
         
-        msg = f'Alert: current price for {crypto} is {percentage_change:.2f}% with respect to yesterday’s closing.' + ending +'\n If you want to stop receiving notifications, use /stop'
+        msg = f'Alert: current price for {crypto} is {percentage_change:.2f}% with respect to yesterday’s closing.' + ending +'\nIf you want to stop receiving notifications, use /stop'
         self.bot.sendMessage(chat_id=chat_id, text=msg)
         print(chat_id,crypto,percentage_change)
         pass
