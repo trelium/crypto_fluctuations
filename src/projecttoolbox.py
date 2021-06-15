@@ -41,12 +41,18 @@ def sanitizecoininput(analyzedcryptos, dbinstance:UsersSQL):
     
     # Useful if the API doesn't work properly
     #Various tries are made until the API actually sends the json
-    response = requests.get("https://api.coingecko.com/api/v3/coins/list")
-    response = response.json()
-    if response==[]:
-        time.sleep(1)
-        response = requests.get("https://api.coingecko.com/api/v3/coins/list")
-        response = response.json()
+    # Useful if the API doesn't work properly
+    #Various tries are made until the API actually sends the json
+    scraped=False
+    while scraped==False:
+        try:
+            response = requests.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false")
+            response = response.json()
+            if response!=[]:
+                scraped=True
+        except:
+            time.sleep(1)
+
 
     tempid=set()
     tempsymbol={}
@@ -75,7 +81,17 @@ def sanitizecoininput(analyzedcryptos, dbinstance:UsersSQL):
     return sanitized
 
 
+
+
 #If you want to test the sanitizer:
-#test=UsersSQL()
-#print(sanitizecoininput(['bitCoin','eTh','LTc'],test))
+# test=UsersSQL()
+# print(sanitizecoininput(['bitCoin','eTh','LTc'],test))
+# print(sanitizecoininput(['bitCoin','eTh','LTc'],test))
+# print(sanitizecoininput(['bitCoin','eTh','LTc'],test))
+# print(sanitizecoininput(['bitCoin','eTh','LTc'],test))
+# print(sanitizecoininput(['bitCoin','eTh','LTc'],test))
+# print(sanitizecoininput(['bitCoin','eTh','LTc'],test))
+# print(sanitizecoininput(['bitCoin','eTh','LTc'],test))
+# print(sanitizecoininput(['bitCoin','eTh','LTc'],test))
+# print(sanitizecoininput(['bitCoin','eTh','LTc'],test))
 #print(sanitizecoininput('parola')) <= Will raise an error
