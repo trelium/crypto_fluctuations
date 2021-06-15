@@ -112,7 +112,7 @@ The users have to input a list of the cryptos they are interested in and the per
 
 
 The commands available to the user are:
-- *\help* to guide the user to guide the bot
+- *\help* to guide the user to start the bot
 - *\start* to start the bot
 - *\stop* to stop the bot
 - *\settings* for updating the user preferences
