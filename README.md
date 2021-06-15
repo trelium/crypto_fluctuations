@@ -23,7 +23,7 @@
 
 ### How the code works in detail:
 
-It is recommended to consult the [project wiki](https://github.com/trelium/crypto_fluctuations/wiki) for more informations if the user wants to use or enchance the code.
+It is recommended to consult the [project wiki](https://github.com/trelium/crypto_fluctuations/wiki/Crypto_fluctuations-wiki) for more informations if the user wants to use or enchance the code.
 
 <a name="usage"/>
 
@@ -105,7 +105,11 @@ The
 
 ## Telegram Bot tutorial and examples:
 An environment variable called 'KEY' should be present with your API key for telegram bots.
-`KEY=123456789abcdefghi`
+```KEY=123456789abcdefghi```
+	
+The bot is fairly self-explanatory and should not be difficult for the end user to use.
+The users have to input a list of the cryptos they are interested in and the percentage of gains/loss after which they want to be notified. The bot will send a maximum of one notification for crypto for day to not overload the user.
+
 
 The commands available to the user are:
 - *\help* to guide the user to guide the bot
@@ -113,3 +117,23 @@ The commands available to the user are:
 - *\stop* to stop the bot
 - *\settings* for updating the user preferences
 - *\supportedcoins* to know which coins are supported by the bot
+	
+### Example of how the bot works :
+	
+Here the user starts the bot.
+
+<img src="https://raw.githubusercontent.com/trelium/crypto_fluctuations/main/data/Telegram%20screenshots/1.jpg" width="20%" height="20%" />
+
+---
+
+The user then states his/her preferences and activates the notification service. 
+
+<img src="https://raw.githubusercontent.com/trelium/crypto_fluctuations/main/data/Telegram%20screenshots/2.jpg" width="20%" height="20%" />
+
+---
+
+After a few minutes, the user receives his/her notifications and after that he/she stops the service to not receive more notifications the day after.
+
+<img src="https://raw.githubusercontent.com/trelium/crypto_fluctuations/main/data/Telegram%20screenshots/3.jpg" width="20%" height="20%" />
+
+
