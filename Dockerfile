@@ -18,8 +18,7 @@ COPY requirements.txt requirements.txt
 RUN pip3 install --default-timeout=1000 -r requirements.txt
 
 COPY . .
-COPY crontab /etc/cron.d/cjob
-RUN chmod 0644 /etc/cron.d/cjob
+
 
 RUN chmod 755 entrypoint.sh
 
