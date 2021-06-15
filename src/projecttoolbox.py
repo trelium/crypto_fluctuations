@@ -16,6 +16,7 @@ Functions currently included:
 import requests
 
 from database import UsersSQL
+import time
 
 def sanitizecoininput(analyzedcryptos, dbinstance:UsersSQL):
     """
@@ -42,7 +43,7 @@ def sanitizecoininput(analyzedcryptos, dbinstance:UsersSQL):
     #Various tries are made until the API actually sends the json
     response = requests.get("https://api.coingecko.com/api/v3/coins/list")
     response = response.json()
-    if response!=[]:
+    if response==[]:
         time.sleep(1)
         response = requests.get("https://api.coingecko.com/api/v3/coins/list")
         response = response.json()
