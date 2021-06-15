@@ -37,8 +37,19 @@ def sanitizecoininput(analyzedcryptos, dbinstance:UsersSQL):
     
 
     #this code fills "tempid" with all possible ids and "tempsymbol" with all possible symbols (es:"eth" for ethereum)
-    response= requests.get("https://api.coingecko.com/api/v3/coins/list")
-    response=response.json()
+    
+    # Useful if the API doesn't work properly
+    #Various tries are made until the API actually sends the json
+    scraped=False
+    while scraped==False:
+        try:
+            response = requests.get("https://api.coingecko.com/api/v3/coins/list")
+            response = response.json()
+            if response!=[]:
+                scraped=True
+        except:
+            time.sleep(2)
+
     tempid=set()
     tempsymbol={}
     for i in response:
@@ -67,6 +78,6 @@ def sanitizecoininput(analyzedcryptos, dbinstance:UsersSQL):
 
 
 #If you want to test the sanitizer:
-# test=UsersSQL()
-# print(sanitizecoininput(['bitCoin','eTh','LTc'],test))
+#test=UsersSQL()
+#print(sanitizecoininput(['bitCoin','eTh','LTc'],test))
 #print(sanitizecoininput('parola')) <= Will raise an error
