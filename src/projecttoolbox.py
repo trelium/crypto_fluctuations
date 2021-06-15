@@ -43,10 +43,10 @@ def sanitizecoininput(analyzedcryptos, dbinstance:UsersSQL):
     #Various tries are made until the API actually sends the json
     response = requests.get("https://api.coingecko.com/api/v3/coins/list")
     response = response.json()
-    if response==[]:
-        time.sleep(1)
-        response = requests.get("https://api.coingecko.com/api/v3/coins/list")
-        response = response.json()
+    # if response==[]:
+    #     time.sleep(1)
+    #     response = requests.get("https://api.coingecko.com/api/v3/coins/list")
+    #     response = response.json()
 
     tempid=set()
     tempsymbol={}
@@ -76,6 +76,6 @@ def sanitizecoininput(analyzedcryptos, dbinstance:UsersSQL):
 
 
 #If you want to test the sanitizer:
-test=UsersSQL()
-print(sanitizecoininput(['bitCoin','eTh','LTc'],test))
+#test=UsersSQL()
+#print(sanitizecoininput(['bitCoin','eTh','LTc'],test))
 #print(sanitizecoininput('parola')) <= Will raise an error
