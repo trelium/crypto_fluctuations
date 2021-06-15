@@ -395,7 +395,7 @@ class Predictions():
     
     def save(self):
         with open(os.path.join(self.path,"currentprediction.json"), "w") as jsonfile:
-            json.dump(self.data, jsonfile)
+            json.dump(self.data, jsonfile,indent=0)
 
     def get_pred(self, coin:str):
         return self.data[coin]
