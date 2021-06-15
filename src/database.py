@@ -343,7 +343,7 @@ class PricesSQL():
         for i in latestprices:
             pricesdata[i[0]]=round(i[1],6)
         dictret['prices']=pricesdata
-        print(dictret)
+        #print(dictret)
 
         if save:
             projectfolder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

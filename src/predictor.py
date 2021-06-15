@@ -67,4 +67,4 @@ for coin in cryptos:
     
 #save all predictions to disk 
 predictions.save()
-
+print('Prediction done for the day')

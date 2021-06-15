@@ -1,0 +1,3 @@
+* * * * * root exec python3 /app/src/apihistoricprices.py
+* * * * * root exec python3 /app/src/historicingestion.py
+* * * * * root exec python3 /app/src/predictor.py

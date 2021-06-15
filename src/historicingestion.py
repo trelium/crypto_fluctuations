@@ -138,7 +138,7 @@ class MqttSQL:
                 price=i[2]
                 deleted=0
                 formattedtuple=tuple([coin,timevalue,price,deleted])
-                print(formattedtuple)
+                #print(formattedtuple)
             
                 # Our API, by default, sends us their most recent price data.
                 # This checks that our data actually comes from midnight.
@@ -163,12 +163,15 @@ class MqttSQL:
                     valuelst.append(str(formattedtuple))
                 else:
                     index=0
+                    print('Inserted 950 data points')
                     self.db.insert_price_values(valuelst)
                     valuelst=[]
+                    alreadypresent=self.db.get_coins_and_timevalues()
 
             # Given that our queue rarely has multiple of 980 elements, we'll do a final push by 
             # selecting the remaining messages.
             if len(valuelst)>0:
+                print('Inserted data in the SQL')
                 self.db.insert_price_values(valuelst)
                 valuelst=[]
 
@@ -182,7 +185,7 @@ class MqttSQL:
 if __name__ == "__main__":
 
     mqttsubber=MqttSQL()
-    mqttsubber.listenscrapers(timescraping=40,verbose=True,save=True)
+    mqttsubber.listenscrapers(timescraping=15,verbose=True,save=True)
     mqttsubber.sqlinserter()
     mqttsubber.db.update_time_window()
     mqttsubber.update_latest_prices()
