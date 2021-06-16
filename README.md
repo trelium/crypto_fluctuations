@@ -22,7 +22,7 @@ Project objective:
 -------
 
 ## Project overview
-In this project, we developed a near-real-time notification system served via a Telegram bot. This Bot upadates the user of the price fluctuations of his/her preferred cryptocurrencies. The user is also informed of our prediction for the closing prices of the cryptos.
+In this project, we developed a near-real-time notification system served via a Telegram bot. This Bot updates the user of the price fluctuations of his/her preferred cryptocurrencies. The user is also informed of our prediction for the closing prices of the cryptos.
 
 - This project scrapes the closing price history of all the most used cryptos. 
 - The prices are then processed in different ways:
