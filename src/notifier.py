@@ -127,22 +127,19 @@ class Notifier:
         """
         Composes the message and sends it to the specified user 
         """
-        print(1)
-        print(chat_id,crypto,percentage_change)
-        if self.predictions.get_pred(crypto) == 'Bullish':
-            ending = '\nWe predict bullish 🔥 market conditions, with an expected closing price higher than  yesterday’s 📈'
-        elif self.predictions.get_pred(crypto) == 'Bearish':
-            ending = '\nWe predict bearish 👎 market conditions, with an expected closing price lower than yesterday’s 📉'
-        else:
+        try:
+            if self.predictions.get_pred(crypto) == 'Bullish':
+                ending = '\nWe predict bullish 🔥 market conditions, with an expected closing price higher than  yesterday’s 📈'
+            elif self.predictions.get_pred(crypto) == 'Bearish':
+                ending = '\nWe predict bearish 👎 market conditions, with an expected closing price lower than yesterday’s 📉'
+            else:
+                ending = ''
+        except:
             ending = ''
-        print(ending)
-        print(2)
-        msg = f'Alert: current price for {crypto} is {percentage_change:+.2f}% with respect to yesterday’s closing.' + ending
-        print(3)
+        msg = f'Alert: current price for {crypto} is {percentage_change:+.2f}% with respect to yesterday’s closing.' + ending 
         self.bot.sendMessage(chat_id=chat_id, text=msg)
         print(chat_id,crypto,percentage_change)
-        print(4)
-        
+
 
 
     def start(self,forever=True,runningtime=None,verbose=False):

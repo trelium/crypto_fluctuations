@@ -29,7 +29,7 @@ from pprint import pprint
 import os 
 import paho.mqtt.client as mqtt
 import time
-
+from datetime import date, datetime
 class NotifierPublish:
     """
     Scrapes the current price data from the CoinGecko API, compares it to the price of 
@@ -131,7 +131,7 @@ class NotifierPublish:
         if forever==True:
             while True:
                 self.__scraper_percentagechange()
-                print(self.percentagechange)
+                print(f'Published a json of len {len(self.percentagechange)} at {datetime.now()}')
                 time.sleep(45)
                 
         else:
