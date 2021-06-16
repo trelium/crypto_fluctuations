@@ -144,7 +144,7 @@ class MqttSQL:
                 # This checks that our data actually comes from midnight.
                 # Works in GMT +01:00
                 dt_object = datetime.datetime.fromtimestamp(timevalue//1000)
-                if not((dt_object.hour==1 or dt_object.hour==0 or dt_object.hour==2) and dt_object.minute==0):
+                if not((dt_object.hour==1 or dt_object.hour==0 or dt_object.hour==2) and dt_object.minute==0 and dt_object.second==0):
                     continue
 
                 #IF the value is already inserted in the SQL, don't add it again, otherwise, add it.
