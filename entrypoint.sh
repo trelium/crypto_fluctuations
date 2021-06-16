@@ -17,8 +17,6 @@ while true; do
         python3 /app/src/apihistoricprices.py
         python3 /app/src/historicingestion.py
         python3 /app/src/predictor.py
-    else
-        echo "Nothing"
     fi
     currentminute=$(date +%M)
     if [[ "$currentminute" == "30" || "$currentminute" == "00" ]];
