@@ -7,6 +7,8 @@ University of Trento - June 2021
 
 This project constitutes the final deliverable for the Big Data Technologies course at the University of Trento, academic year 2020/2021.
 
+Our paper _Cryptocurrency Price Fluctuation: Notifier and Predictor_ related to this repository is available [here](https://drive.google.com/file/d/1-b_b9m72kj7jU8a2b-01yuguExlbMr-j/view?usp=sharing)
+
 Project objective:
  * Design and implement a big data system for detecting and predicting sudden variations (> X% on a daily basis) for a set of cryptocurrencies. 
 
