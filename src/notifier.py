@@ -115,6 +115,7 @@ class Notifier:
 
         for coin in newprices:
             users_to_notify = self.dbusers.get_interested_users(crypto=coin,threshold=newprices[coin],considered_date=yesterdaytimestamp)
+            print(users_to_notify)
             if users_to_notify!=[]: #checks if any user is interested in the given crypto
                 for user in users_to_notify: 
                     print(f'{user} should be notified for a price change of {coin}')
@@ -126,17 +127,22 @@ class Notifier:
         """
         Composes the message and sends it to the specified user 
         """
+        print(1)
+        print(chat_id,crypto,percentage_change)
         if self.predictions.get_pred(crypto) == 'Bullish':
             ending = '\nWe predict bullish 🔥 market conditions, with an expected closing price higher than  yesterday’s 📈'
         elif self.predictions.get_pred(crypto) == 'Bearish':
             ending = '\nWe predict bearish 👎 market conditions, with an expected closing price lower than yesterday’s 📉'
         else:
             ending = ''
-        
+        print(ending)
+        print(2)
         msg = f'Alert: current price for {crypto} is {percentage_change:+.2f}% with respect to yesterday’s closing.' + ending +'\nIf you want to stop receiving notifications, use /stop'
+        print(3)
         self.bot.sendMessage(chat_id=chat_id, text=msg)
         print(chat_id,crypto,percentage_change)
-        pass
+        print(4)
+        
 
 
     def start(self,forever=True,runningtime=None,verbose=False):

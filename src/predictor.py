@@ -57,10 +57,9 @@ for coin in cryptos:
     #Making prediction for current coin 
     currentprices = np.asarray([i[0] for i in priceshistory.get_prices(coin, all=False)])
     currentprices = np.expand_dims(currentprices, axis=0)
-    try:
-        predprice = reg.predict(currentprices)
-    except:
-        continue
+    
+    predprice = reg.predict(currentprices)
+
 
     #if value for today is higher than yesterday, write bullish in predictions, else bearish
     if predprice > np.squeeze(currentprices)[-1]:
