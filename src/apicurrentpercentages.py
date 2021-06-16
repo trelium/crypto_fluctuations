@@ -141,6 +141,11 @@ class NotifierPublish:
             
             
 if __name__ == "__main__": 
-    percentagepublisher=NotifierPublish()
-    percentagepublisher.start(forever=True)
-
+    while True:
+        try:
+            percentagepublisher=NotifierPublish()
+            percentagepublisher.start(forever=True)
+        except:
+            time.sleep(1)
+            continue
+    
