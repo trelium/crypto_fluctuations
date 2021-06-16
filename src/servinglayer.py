@@ -102,10 +102,10 @@ def settings_command(update, context):
         if db.get_active(chat = str(update.message.chat.id)) == 1:
             stop_command(update, context)
         update.message.reply_text('Please type the percentage of change in price (compared to yesterday\'s closing price in $). The Bot will send you a notification whenever the price goes above or below your desired percentage of change.')
-        update.message.reply_text('Please use the following format to specify the coins and percentages you\'re interested in: Coinname1 @ percentage1 , Coinname2 @ percentage2 , ...')
+        update.message.reply_text('Please use the following format to specify the coins and percentages you\'re interested in: "Coinname1" @ percentage1 , "Coinname2" @ percentage2 , ...')
         update.message.reply_text('For example, these different ways of formatting are all accepted: _ bitcoin @2\.2%, eth @ 5,6% , xrp @1% _ ',parse_mode='MarkdownV2')
         update.message.reply_text('To get a list of currently supported coins, issue command /supportedcoins')
-        update.message.reply_text('If you want to modify your preferences later, use /settings')
+        update.message.reply_text('If you want to add or modify your preferences later, use /settings')
     else:
         update.message.reply_text('Error updating preferences. Please contact the admin') 
   
