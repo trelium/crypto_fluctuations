@@ -6,7 +6,6 @@
 ##### Table of Contents  
 * [Project overview](#overview)  
 * [Usage](#usage) 
-* [Running the code](#running)
 * [Telegram Bot](#telegram)
 
 <a name="overview"/>
@@ -31,22 +30,29 @@ It is recommended to consult the [project wiki](https://github.com/trelium/crypt
 
 ## Usage
 
-# TODO: Sta roba va modificata dopo il docker
+To use this code, it is suggested to rely on the Dockerfile, which is an image that will run all the scripts correctly and provide a fully-working bot.
+If the user wants to run the code without relying on the Docker Image, it is suggested to consult The [running the code](https://github.com/trelium/crypto_fluctuations/wiki/Crypto_fluctuations-wiki#running) section of the wiki.
 
-### Environment
+To run either the Dockerfile or the code, a `.env` should be inserted in the main folder crypto_fluctuations. This file should be formatted like this:
+```
+# Credentials to access SQL instance on 
+SQL_SERVER="<name>.database.windows.net"
+SQL_DATABASE=
+SQL_USERNAME=
+SQL_PASSWORD=
+SQL_DRIVER="{ODBC Driver 17 for SQL Server}"
 
-This project requires Python 3.
 
+# Credentials to access Telegram bot configuration 
+KEY = "123456789abcdefghi"
 
-### Requirements
-
-The libraries defined in the `requirements.txt` file should be installed.
-
-```bash
-pip install -r requirements.txt
+# MQtt broker address
+BROKER_ADDRESS="localhost" (or any IP)
 ```
 
-### Questi due non credo serva dockerizzarli:
+
+
+An external MQTT broker and Microsoft SQL server are needed to run either the dockerfile or the code. More details about how to configure these two services are presented in the next two sections.
 
 ### MQTT broker
 A functioning MQTT broker must be setup to use most of the services.
@@ -74,30 +80,7 @@ SQL_DRIVER="{ODBC Driver 17 for SQL Server}"
 As for the needed tables: the code in _database.py_ will generate them automatically if they are not already present in the database.
 The two tables will be called _pricehistory_ and _users_.
 
---------
 
-
-
-
-<a name="running"/>
-
-
-## Running the code
-
-This project offers different services that can be run separately:
-* These two services should be run once a day:
-	* _apihistoricprices.py_ is used to scrape the price histories and publishes the in a customized 	scraper/<name of the crypto> topic
-	* _historicingestion.py_ subscribes to the aforementioned topics and loads the data in a Microsoft SQL 	Server table
-
-* These three services will run until manually stopped:
-	* _apicurrentpercentages.py_ calculates the daily price percentage change of each crypto and sends them in 	a 	"percentagechange" MQTT Topic
-	* _notifier.py_ subscribes to the "percentagechange" topic, filters which user should be notified and 	sends the notifications.
-	* _servinglayer.py_ is used to start the telegram bot.
-
-The MQTT services run at QOS 1, as such they can be run synchronously or asynchronously.
-
-The other services, _predictor.py_,_projecttoolbox.py_ and _database.py_ , manage some back-end processes and as such it is not necessary for the user to run them.
-The 
 
 <a name="telegram"/>
 	
