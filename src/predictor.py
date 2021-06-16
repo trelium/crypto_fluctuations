@@ -61,6 +61,7 @@ for coin in cryptos:
         predprice = reg.predict(currentprices)
     except:
         predictions.set_no_pred(coin) #in case prediction fails 
+        continue
 
     #if value for today is higher than yesterday, write bullish in predictions, else bearish
     if predprice > np.squeeze(currentprices)[-1]:

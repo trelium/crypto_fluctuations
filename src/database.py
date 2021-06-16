@@ -398,4 +398,8 @@ class Predictions():
             json.dump(self.data, jsonfile,indent=0)
 
     def get_pred(self, coin:str):
+        print(1.5)
+        print(coin)
+        print(self.data[coin])
+        print(self.data['dai'])
         return self.data[coin]
