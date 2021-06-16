@@ -21,7 +21,7 @@ while true; do
         echo "Nothing"
     fi
     currentminute=$(date +%M)
-    if [[ "$currentminute" == "15" || "$currentminute" == "30" || "$currentminute" == "45" || "$currentminute" == "00" ]];
+    if [[ "$currentminute" == "30" || "$currentminute" == "00" ]];
     then
         echo "Restart for fault tolerance"
         pkill -f servinglayer.py
