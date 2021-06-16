@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Running first setup"
-python3 -u /app/src/apihistoricprices.py
+python3 -u /app/src/first-history-scraping.py
 python3 -u /app/src/historicingestion.py
 python3 -u /app/src/predictor.py
 
@@ -20,5 +20,18 @@ while true; do
     else
         echo "Nothing"
     fi
-    sleep 59.5
+    currentminute=$(date +%M)
+    if [[ "$currentminute" == "15" || "$currentminute" == "30" || "$currentminute" == "45" || "$currentminute" == "00" ]];
+    then
+        echo "Restart for fault tolerance"
+        pkill -f servinglayer.py
+        pkill -f apicurrentpercentages.py
+        pkill -f notifier.py
+        sleep 1.5
+        exec python3 src/servinglayer.py &
+        exec python3 src/apicurrentpercentages.py &
+        exec python3 src/notifier.py &
+    fi
+    sleep 58
 done
+
