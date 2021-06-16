@@ -39,13 +39,13 @@ for coin in cryptos:
     startidx = -320
     endidx = -120
     X, Y = [], []
-    while abs(startidx)<len(prices): #make overlapping time windows for training 
+    while abs(startidx)<=len(prices): #make overlapping time windows for training 
         X.append(prices[startidx:endidx])
         Y.append(prices[endidx])
         startidx -= 120
         endidx -= 120
     
-    if len(X) == 0: #not enough training data 
+    if len(X) == 0: #not enough training data, move to next coin
         predictions.set_no_pred(coin)
         continue 
     else: #training   
@@ -60,7 +60,7 @@ for coin in cryptos:
     try:
         predprice = reg.predict(currentprices)
     except:
-        continue
+        predictions.set_no_pred(coin) #in case prediction fails 
 
     #if value for today is higher than yesterday, write bullish in predictions, else bearish
     if predprice > np.squeeze(currentprices)[-1]:
