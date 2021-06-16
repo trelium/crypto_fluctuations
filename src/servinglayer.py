@@ -119,6 +119,9 @@ def stop_command(update, context):
 def help_command(update, context):
     #return message of welcome
     update.message.reply_text('Enter command /start to begin.')
+    update.message.reply_text('Enter command /settings to update your preferences.')
+    update.message.reply_text('Enter command /stop to stop receiving notifications.')
+    update.message.reply_text('Enter command /supportedcoins for the list of supported coins')
 
 def supported_coins(update,context):
     update.message.reply_text('This is a list of currently supported coins:')
