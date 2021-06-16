@@ -132,7 +132,7 @@ class NotifierPublish:
             while True:
                 self.__scraper_percentagechange()
                 print(f'Published a json of len {len(self.percentagechange)} at {datetime.now()}')
-                time.sleep(45)
+                time.sleep(40)
                 
         else:
             self.__scraper_percentagechange()
