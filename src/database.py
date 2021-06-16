@@ -25,6 +25,7 @@ import os
 import json
 import requests
 import math
+import time
 
 load_dotenv()
 
@@ -112,13 +113,22 @@ class UsersSQL():
         :Params:
         value: 0 = inactive; 1 = active
         """
+        # Tries two times to make sure that there is no error
         try:
             self.cursor.execute("""UPDATE dbo.users SET active = {} 
                                     WHERE chat_id = '{}' """.format(value, chat))
             self.cnxn.commit()
             return True
         except: 
-            return False 
+            try:
+                time.sleep(1)
+                self.cursor.execute("""UPDATE dbo.users SET active = {} 
+                                        WHERE chat_id = '{}' """.format(value, chat))
+                self.cnxn.commit()
+                return True
+            except:
+                return False
+
 
     def is_already_present(self,chat:str()):
         """
@@ -398,8 +408,4 @@ class Predictions():
             json.dump(self.data, jsonfile,indent=0)
 
     def get_pred(self, coin:str):
-        print(1.5)
-        print(coin)
-        print(self.data[coin])
-        print(self.data['dai'])
         return self.data[coin]

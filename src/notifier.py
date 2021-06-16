@@ -115,7 +115,6 @@ class Notifier:
 
         for coin in newprices:
             users_to_notify = self.dbusers.get_interested_users(crypto=coin,threshold=newprices[coin],considered_date=yesterdaytimestamp)
-            print(users_to_notify)
             if users_to_notify!=[]: #checks if any user is interested in the given crypto
                 for user in users_to_notify: 
                     print(f'{user} should be notified for a price change of {coin}')
