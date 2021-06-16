@@ -41,7 +41,7 @@ It is recommended to consult the [project wiki](https://github.com/trelium/crypt
 
 ## Usage
 
-To use this code, it is suggested to rely on the Dockerfile, which is an image that will run all the scripts correctly and provide a fully-working bot.
+To use this code, it is suggested to rely on the Dockerfile, which is an image that will run all the scripts correctly.
 If the user wants to run the code without relying on the Docker Image, it is suggested to consult The [running the code](https://github.com/trelium/crypto_fluctuations/wiki/Crypto_fluctuations-wiki#running) section of the wiki.
 
 An external MQTT broker and Microsoft SQL server are needed to run **either** the dockerfile or the code. More details about how to configure these two services are presented in the next two sections. We suggest to consult the official documentation of [MQTT](https://mosquitto.org/download/) and [Microsoft SQL Server](https://docs.microsoft.com/it-it/sql/database-engine/install-windows/install-sql-server?view=sql-server-ver15) to correctly install these two services.
