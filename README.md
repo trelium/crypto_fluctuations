@@ -22,13 +22,14 @@ Project objective:
 -------
 
 ## Project overview
-In this project, we developed a near-real-time notification system served via a Telegram bot. This Bot updates the user of the price fluctuations of his/her preferred cryptocurrencies. The user is also informed of our prediction for the closing prices of the cryptos.
+In this project, we developed a near-real-time notification system served via a Telegram bot. The user interacts with it in order to set alert thresholds for different cryptocurrencies. An alert threshold is a percentage price value that refers to a currency's quotation at a given moment in time, with respect to the previous day's closing price. Once thresholds are set, the bot updates the user whenever the price for one of the coins he set thresholds for raises above of falls below the (absolute) threshold value. The sent notificaiton message includes the current price as well as our prediction regarding today's closing, expressed as binary outcome.
 
-- This project scrapes the closing price history of all the most used cryptos. 
-- The prices are then processed in different ways:
-  - A model is used to predict the current day closing price for each given crypto.
-  - The current price of each crypto is scraped every minute, compared to the previous day price and a percentage of change of the price is calculated for each crypto.
-- Particular care has been given to the serving layer: a fully-functioning telegram bot that is capable of storing the user preferences and sends notifications based on those preferences.
+Behind the scenes, things go like this:
+- Once a day, the service ingests the most recent closing prices for the 50 most popular cryptos. 
+  - A model predicts the current day closing price for each given crypto, considering also the newly ingested data.
+- The current price of each crypto is ingested every minute:
+  - It is compared to the previous day's price to compute the percentage of change.
+  - These percentage changes are compared to the user preferences to identify which users need to be currently notified.
 
 
 ### How the code works in detail:
@@ -42,17 +43,18 @@ It is recommended to consult the [project wiki](https://github.com/trelium/crypt
 ## Usage
 
 To use this code, it is suggested to rely on the Dockerfile, which is an image that will run all the scripts correctly.
-If the user wants to run the code without relying on the Docker Image, it is suggested to consult The [running the code](https://github.com/trelium/crypto_fluctuations/wiki/Crypto_fluctuations-wiki#running) section of the wiki.
+If you want to run the code without relying on the Docker Image, it is suggested to consult The [running the code](https://github.com/trelium/crypto_fluctuations/wiki/Crypto_fluctuations-wiki#running) section of the wiki.
 
-An external MQTT broker and Microsoft SQL server are needed to run **either** the dockerfile or the code. More details about how to configure these two services are presented in the next two sections. We suggest to consult the official documentation of [MQTT](https://mosquitto.org/download/) and [Microsoft SQL Server](https://docs.microsoft.com/it-it/sql/database-engine/install-windows/install-sql-server?view=sql-server-ver15) to correctly install these two services.
+In either case, a working installation of the Eclipse MQTT broker and of the Microsoft ODBC driver are needed to run the code. More details about how to configure these two services are presented in the next two sections. We suggest to consult the official documentation of [MQTT](https://mosquitto.org/download/) and [Microsoft ODBC driver](https://docs.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver15) to correctly install these two services. 
+Note that here we assume you have access to a Microsoft SQL server (remotely as Azure SQL database or elsewhere): in case you do not, you'll also need to install the [Microsoft SQL Server](https://docs.microsoft.com/en-us/sql/database-engine/install-windows/install-sql-server?view=sql-server-ver15) software to have a local database to work with. 
 
-To run either the Dockerfile or the code, a `.env` should be inserted in the main folder crypto_fluctuations. This file should be formatted like this:
+Also, a `.env` file is always needed to run the code and should be inserted in the main folder "crypto_fluctuations". This file should be formatted in this way:
 ```
 # Credentials to access SQL instance on 
-SQL_SERVER="<name>.database.windows.net"
-SQL_DATABASE=
-SQL_USERNAME=
-SQL_PASSWORD=
+SQL_SERVER="..."
+SQL_DATABASE="..."
+SQL_USERNAME="..."
+SQL_PASSWORD="..."
 SQL_DRIVER="{ODBC Driver 17 for SQL Server}"
 
 
@@ -64,7 +66,7 @@ BROKER_ADDRESS="localhost" (or any IP)
 ```
 
 ### MQTT broker
-A functioning MQTT broker must be setup to use most of the services.
+A functioning MQTT broker must be setup on your system to use most of the services.
 An environment variable called 'BROKER_ADDRESS' should be present with the IP of the broker.
 for example: `BROKER_ADDRESS="localhost"`
 
@@ -76,17 +78,7 @@ max_inflight_messages 0 #(otherwise it will not function properly in asynchronou
 
 ### SQL server
 A database in Microsoft SQL server should be present for the project to work.
-Various environment variables should be present for the code to work flawlessly:
-```
-# Credentials to access SQL instance on 
-SQL_SERVER="<name>.database.windows.net"
-SQL_DATABASE=
-SQL_USERNAME=
-SQL_PASSWORD=
-SQL_DRIVER="{ODBC Driver 17 for SQL Server}"
-```
-
-As for the needed tables: the code in _database.py_ will generate them automatically if they are not already present in the database.
+As for the needed tables, the code in _database.py_ will generate them automatically if they are not already present in the database.
 The two tables will be called _pricehistory_ and _users_.
 
 
