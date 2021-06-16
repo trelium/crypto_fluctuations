@@ -1,7 +1,16 @@
 # Cryptocurrency Telegram Price Fluctuation Notifier and Predictor 
+Developed by Jacopo Mocellin, Riccardo Improta
 
+University of Trento - June 2021
+
+--------
+
+This project constitutes the final deliverable for the Big Data Technologies course at the University of Trento, academic year 2020/2021.
+
+Project objective:
  * Design and implement a big data system for detecting and predicting sudden variations (> X% on a daily basis) for a set of cryptocurrencies. 
 
+--------
 
 ##### Table of Contents  
 * [Project overview](#overview)  
@@ -13,10 +22,12 @@
 -------
 
 ## Project overview
+In this project, we developed a near-real-time notification system served via a Telegram bot. This Bot upadates the user of the price fluctuations of his/her preferred cryptocurrencies. The user is also informed of our prediction for the closing prices of the cryptos.
+
 - This project scrapes the closing price history of all the most used cryptos. 
 - The prices are then processed in different ways:
   - A model is used to predict the current day closing price for each given crypto.
-  - The current price of each crypto is scraped every minute, compared to the previous day price and a percentage of change in price is calculated for each crypto.
+  - The current price of each crypto is scraped every minute, compared to the previous day price and a percentage of change of the price is calculated for each crypto.
 - Particular care has been given to the serving layer: a fully-functioning telegram bot that is capable of storing the user preferences and sends notifications based on those preferences.
 
 
