@@ -22,6 +22,7 @@ Other functionalities:
 
 """
 
+
 from dotenv import load_dotenv
 import os
 import time
@@ -50,7 +51,7 @@ class Notifier:
         self.predictions = Predictions(overwrite=False)
 
     
-    def listen_publisher(self,time_activation=30,verboselisten=False):
+    def listen_publisher(self,time_activation=100,verboselisten=False):
         """
         this function connects the class to the 'percentagechange' mqtt topic and pushes the messages in a queue.
         Arguments: \\
@@ -72,8 +73,10 @@ class Notifier:
         #This function specifies what happens every time we receive a message on the mqtt topic 
         def on_message(client, userdata, msg):
             
-            
+            print('Message received on MQTT')
+
             if verboselisten:
+                
                 print(msg.topic+" "+str(msg.payload))
 
             self.myqueue.put(msg.payload)
@@ -145,19 +148,18 @@ class Notifier:
         if forever==True and runningtime==None:
             while True:
                 self.listen_publisher(verboselisten=verbose)
-                test.process_queue()
-                time.sleep(5)
+                self.process_queue()
         
         else:
-            test.listen_publisher(verboselisten=verbose,time_activation=runningtime)
-            test.process_queue()
+            self.listen_publisher(verboselisten=verbose,time_activation=runningtime)
+            self.process_queue()
 
 
 if __name__ == "__main__":
     while True:
         try:
             test=Notifier()
-            test.start(verbose=True)
+            test.start(verbose=False)
         except:
             time.sleep(2)
             continue

@@ -1,0 +1,202 @@
+[
+{
+"id": "bitcoin",
+"symbol": "btc"
+},
+{
+"id": "ethereum",
+"symbol": "eth"
+},
+{
+"id": "tether",
+"symbol": "usdt"
+},
+{
+"id": "binancecoin",
+"symbol": "bnb"
+},
+{
+"id": "cardano",
+"symbol": "ada"
+},
+{
+"id": "dogecoin",
+"symbol": "doge"
+},
+{
+"id": "ripple",
+"symbol": "xrp"
+},
+{
+"id": "polkadot",
+"symbol": "dot"
+},
+{
+"id": "usd-coin",
+"symbol": "usdc"
+},
+{
+"id": "uniswap",
+"symbol": "uni"
+},
+{
+"id": "bitcoin-cash",
+"symbol": "bch"
+},
+{
+"id": "litecoin",
+"symbol": "ltc"
+},
+{
+"id": "solana",
+"symbol": "sol"
+},
+{
+"id": "chainlink",
+"symbol": "link"
+},
+{
+"id": "matic-network",
+"symbol": "matic"
+},
+{
+"id": "binance-usd",
+"symbol": "busd"
+},
+{
+"id": "theta-token",
+"symbol": "theta"
+},
+{
+"id": "internet-computer",
+"symbol": "icp"
+},
+{
+"id": "stellar",
+"symbol": "xlm"
+},
+{
+"id": "wrapped-bitcoin",
+"symbol": "wbtc"
+},
+{
+"id": "ethereum-classic",
+"symbol": "etc"
+},
+{
+"id": "vechain",
+"symbol": "vet"
+},
+{
+"id": "filecoin",
+"symbol": "fil"
+},
+{
+"id": "tron",
+"symbol": "trx"
+},
+{
+"id": "monero",
+"symbol": "xmr"
+},
+{
+"id": "dai",
+"symbol": "dai"
+},
+{
+"id": "eos",
+"symbol": "eos"
+},
+{
+"id": "amp-token",
+"symbol": "amp"
+},
+{
+"id": "shiba-inu",
+"symbol": "shib"
+},
+{
+"id": "cdai",
+"symbol": "cdai"
+},
+{
+"id": "aave",
+"symbol": "aave"
+},
+{
+"id": "okb",
+"symbol": "okb"
+},
+{
+"id": "neo",
+"symbol": "neo"
+},
+{
+"id": "kusama",
+"symbol": "ksm"
+},
+{
+"id": "algorand",
+"symbol": "algo"
+},
+{
+"id": "compound-usd-coin",
+"symbol": "cusdc"
+},
+{
+"id": "bitcoin-cash-sv",
+"symbol": "bsv"
+},
+{
+"id": "cosmos",
+"symbol": "atom"
+},
+{
+"id": "iota",
+"symbol": "miota"
+},
+{
+"id": "crypto-com-chain",
+"symbol": "cro"
+},
+{
+"id": "pancakeswap-token",
+"symbol": "cake"
+},
+{
+"id": "compound-ether",
+"symbol": "ceth"
+},
+{
+"id": "klay-token",
+"symbol": "klay"
+},
+{
+"id": "ftx-token",
+"symbol": "ftt"
+},
+{
+"id": "celsius-degree-token",
+"symbol": "cel"
+},
+{
+"id": "maker",
+"symbol": "mkr"
+},
+{
+"id": "tezos",
+"symbol": "xtz"
+},
+{
+"id": "theta-fuel",
+"symbol": "tfuel"
+},
+{
+"id": "terra-luna",
+"symbol": "luna"
+},
+{
+"id": "huobi-token",
+"symbol": "ht"
+}
+]

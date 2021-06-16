@@ -132,7 +132,7 @@ class NotifierPublish:
             while True:
                 self.__scraper_percentagechange()
                 print(self.percentagechange)
-                time.sleep(40)
+                time.sleep(45)
                 
         else:
             self.__scraper_percentagechange()
